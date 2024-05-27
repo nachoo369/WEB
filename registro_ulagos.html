@@ -16,7 +16,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background-color: blue;
+            background-color: #0055B7;
             padding: 10px 20px;
             color: white; /* Añadido: color de texto blanco */
         }
@@ -88,48 +88,89 @@
             padding: 10px 20px;
             border-radius: 5px;
         }
+
+        /* Añadido: Estilos para el formulario */
+        #reservaForm {
+            display: flex;
+            flex-direction: column;
+            max-width: 300px;
+            margin: 0 auto; /* Centra el formulario horizontalmente */
+        }
+
+        #reservaForm label {
+            color: green;
+        }
+
+        #reservaForm input[type="text"],
+        #reservaForm input[type="tel"],
+        #reservaForm input[type="date"],
+        #reservaForm input[type="email"] {
+            background-color: #f2f2f2;
+            padding: 5px;
+            margin-bottom: 10px;
+        }
+
+        #reservaForm button[type="submit"] {
+            background-color: blue;
+            color: white;
+            padding: 8px 12px;
+            border: none;
+            cursor: pointer;
+            margin-top: 20px; /* Espacio adicional arriba del botón */
+        }
+
+        #mensajeReserva {
+            text-align: center;
+            margin-top: 20px; /* Espacio adicional arriba del mensaje */
+        }
     </style>
 </head>
 <body>
     <div class="navbar">
-        <img src="logo_ula.png" alt="Logo de la Universidad">
+        <img src="logo_ula.png" alt="Logo">
+        <div class="nav-buttons">
+            <button onclick="location.href='ingresar.html'">Ingresar</button>
+            <button onclick="location.href='registro.html'">Registro</button>
+            <button onclick="location.href='ayuda.html'">Ayuda</button>
         </div>
-</body>
-    <h1 style="color: blue;">Estacionamientos Chuyaca - Meyer </h1>
-    <form id="reservaForm" style="display: flex; flex-direction: column; max-width: 300px;">
-        <label for="nombre" style="color: green;">Nombre:</label>
-        <input type="text" id="nombre" name="nombre" required style="background-color: #f2f2f2; padding: 5px; margin-bottom: 10px;">
+    </div>
+    <div class="content">
+        <h1 style="color: blue;">Estacionamientos Chuyaca - Meyer </h1>
+        <form id="reservaForm">
+            <label for="nombre">Nombre:</label>
+            <input type="text" id="nombre" name="nombre" required>
+            
+            <label for="placa">Número de Placa:</label>
+            <input type="text" id="placa" name="placa" required>
+            
+            <label for="color">Color del Auto:</label>
+            <input type="text" id="color" name="color" required>
+            
+            <label for="telefono">Teléfono:</label>
+            <input type="tel" id="telefono" name="telefono">
+            
+            <label for="fecha">Fecha de Reserva:</label>
+            <input type="date" id="fecha" name="fecha" required>
+            
+            <label for="correo">Correo Electrónico (solo @ulagos.cl o @alumnos.ulagos.cl):</label>
+            <input type="email" id="correo" name="correo" required oninput="validarCorreo()">
+            <script>
+                function validarCorreo() {
+                    const inputCorreo = document.getElementById('correo');
+                    const correo = inputCorreo.value;
+                    if (!/^[a-zA-Z0-9._%+-]+@(ulagos\.cl|alumnos\.ulagos\.cl)$/.test(correo)) {
+                        inputCorreo.setCustomValidity('Por favor, ingrese un correo con dominio @ulagos.cl o @alumnos.ulagos.cl');
+                    } else {
+                        inputCorreo.setCustomValidity('');
+                    }
+                }
+            </script>        
+            <button type="submit">Selecciona Lugar</button>
+        </form>
         
-        <label for="placa" style="color: green;">Número de Placa:</label>
-        <input type="text" id="placa" name="placa" required style="background-color: #f2f2f2; padding: 5px; margin-bottom: 10px;">
-        
-        <label for="color" style="color: green;">Color del Auto:</label>
-        <input type="text" id="color" name="color" required style="background-color: #f2f2f2; padding: 5px; margin-bottom: 10px;">
-        
-        <label for="telefono" style="color: green;">Teléfono:</label>
-        <input type="tel" id="telefono" name="telefono" style="background-color: #f2f2f2; padding: 5px; margin-bottom: 10px;">
-        
-        <label for="fecha" style="color: green;">Fecha de Reserva:</label>
-        <input type="date" id="fecha" name="fecha" required style="background-color: #f2f2f2; padding: 5px; margin-bottom: 10px;">
-        
-        <label for="correo" style="color: red;">Correo Electrónico (solo @ulagos.cl o @alumnos.ulagos.cl):</label>
-        <input type="email" id="correo" name="correo" required style="background-color: #f2f2f2; padding: 5px; margin-bottom: 10px;" oninput="validarCorreo()">
-        <script>
-        function validarCorreo() {
-            const inputCorreo = document.getElementById('correo');
-            const correo = inputCorreo.value;
-            if (!/^[a-zA-Z0-9._%+-]+@(ulagos\.cl|alumnos\.ulagos\.cl)$/.test(correo)) {
-                inputCorreo.setCustomValidity('Por favor, ingrese un correo con dominio @ulagos.cl o @alumnos.ulagos.cl');
-            } else {
-                inputCorreo.setCustomValidity('');
-            }
-        }
-        </script>        
-        <button type="submit" style="background-color: blue; color: white; padding: 8px 12px; border: none; cursor: pointer;">Selecciona Lugar</button>
-    </form>
-    
-    <div id="mensajeReserva"></div>
-    
+        <div id="mensajeReserva"></div>
+    </div>
+
     <script src="src/script.js"></script>
 </body>
 </html>

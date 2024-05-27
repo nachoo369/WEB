@@ -16,7 +16,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background-color: blue;
+            background-color: #0055B7;
             padding: 10px 20px;
             color: white; /* Añadido: color de texto blanco */
         }
@@ -43,79 +43,41 @@
         .navbar .nav-buttons button:hover {
             background-color: lightgray;
         }
-
-        .content {
-            text-align: center;
-            padding: 50px;
-        }
-
-        .content button {
-            background-color: blue;
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            margin: 20px;
-            cursor: pointer;
-            border-radius: 5px;
-            font-size: 16px;
-            transition: background-color 0.3s;
-        }
-
-        .content button:hover {
-            background-color: darkblue;
-        }
-
-        .image-container {
-            position: relative;
-            text-align: center;
-            color: white;
-            background-color: blue; /* Añadido: fondo azul */
-            padding: 20px; /* Añadido: espacio de relleno */
-        }
-
-        .image-container img {
-            width: 100%;
-            max-width: 1500px;
-            height: auto;
-        }
-
-        .image-container .overlay-text {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: rgba(0, 0, 0, 0.5);
-            padding: 10px 20px;
-            border-radius: 5px;
-        }
     </style>
 </head>
 <body>
     <div class="navbar">
         <img src="logo_ula.png" alt="Logo de la Universidad">
+        <div class="nav-buttons">
+            <button>Ingresar</button>
+            <button>Registro</button>
+            <button>Ayuda</button>
         </div>
-</body>
-    <h1 style="color: blue;">Estacionamientos Chuyaca - Meyer </h1>
-    <form id="reservaForm" style="display: flex; flex-direction: column; max-width: 300px;">
-        <label for="nombre" style="color: green;">Nombre:</label>
-        <input type="text" id="nombre" name="nombre" required style="background-color: #f2f2f2; padding: 5px; margin-bottom: 10px;">
-        
-        <label for="placa" style="color: green;">Número de Placa:</label>
-        <input type="text" id="placa" name="placa" required style="background-color: #f2f2f2; padding: 5px; margin-bottom: 10px;">
-        
-        <label for="color" style="color: green;">Color del Auto:</label>
-        <input type="text" id="color" name="color" required style="background-color: #f2f2f2; padding: 5px; margin-bottom: 10px;">
-        
-        <label for="telefono" style="color: green;">Teléfono:</label>
-        <input type="tel" id="telefono" name="telefono" style="background-color: #f2f2f2; padding: 5px; margin-bottom: 10px;">
-        
-        <label for="fecha" style="color: green;">Fecha de Reserva:</label>
-        <input type="date" id="fecha" name="fecha" required style="background-color: #f2f2f2; padding: 5px; margin-bottom: 10px;">
-        
-        <button type="submit" style="background-color: blue; color: white; padding: 8px 12px; border: none; cursor: pointer;">Selecciona Lugar</button>
-    </form>
+    </div>
+
+    <h1 style="color: blue; text-align: center;">Estacionamientos Chuyaca - Meyer </h1>
+    <div style="text-align: center;">
+        <form id="reservaForm" style="display: inline-block; text-align: left; max-width: 300px;">
+            <label for="nombre" style="color: green;">Nombre:</label>
+            <input type="text" id="nombre" name="nombre" required style="background-color: #f2f2f2; padding: 5px; margin-bottom: 10px;">
+            
+            <label for="placa" style="color: green;">Número de Placa:</label>
+            <input type="text" id="placa" name="placa" required style="background-color: #f2f2f2; padding: 5px; margin-bottom: 10px;">
+            
+            <label for="color" style="color: green;">Color del Auto:</label>
+            <input type="text" id="color" name="color" required style="background-color: #f2f2f2; padding: 5px; margin-bottom: 10px;">
+            
+            <label for="telefono" style="color: green;">Teléfono:</label>
+            <input type="tel" id="telefono" name="telefono" style="background-color: #f2f2f2; padding: 5px; margin-bottom: 10px;">
+            
+            <label for="fecha" style="color: green;">Fecha de Reserva:</label>
+            <input type="date" id="fecha" name="fecha" required style="background-color: #f2f2f2; padding: 5px; margin-bottom: 10px;">
+            
+            <button type="submit" style="background-color: blue; color: white; padding: 8px 12px; border: none; cursor: pointer;">Selecciona Lugar</button>
+        </form>
+    </div>
     
-    <div id="mensajeReserva"></div>
+    <div id="mensajeReserva" style="text-align: center; margin-top: 20px;"></div>
     
     <script src="src/script.js"></script>
 </body>
