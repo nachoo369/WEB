@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<header>
+    <img src="logo_ula.png" alt="Logo de la Universidad">
+    <!-- Otro contenido de la cabecera -->
+</header>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reserva de Estacionamiento Universitario</title>
+    <link rel="stylesheet" href="src/style.css">
+</head>
+<body>
+    <h1>Estacionamientos Chuyaca - Meyer </h1>
+    <form id="reservaForm">
+        <label for="nombre">Nombre:</label>
+        <input type="text" id="nombre" name="nombre" required>
+        
+        <label for="placa">Número de Placa:</label>
+        <input type="text" id="placa" name="placa" required>
+        
+        <label for="fecha">Fecha de Reserva:</label>
+        <input type="date" id="fecha" name="fecha" required>
+        
+        <button type="submit">Reservar Estacionamiento</button>
+    </form>
+    
+    <div id="mensajeReserva"></div>
+    
+    <script src="src/script.js"></script>
+</body>
+</html>
