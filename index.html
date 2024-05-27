@@ -1,10 +1,107 @@
-<<<<<<< HEAD
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
-<meta charset="UTF-8">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Estacionamiento ULagos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: white;
+            margin: 0;
+            padding: 0;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #0055B7;
+            padding: 10px 20px;
+        }
+
+        .navbar img {
+            height: 50px;
+        }
+
+        .navbar .nav-buttons {
+            display: flex;
+        }
+
+        .navbar .nav-buttons button {
+            background-color: white;
+            color: blue;
+            border: none;
+            padding: 10px 20px;
+            margin-left: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .navbar .nav-buttons button:hover {
+            background-color: lightgray;
+        }
+
+        .content {
+            text-align: center;
+            padding: 50px;
+        }
+
+        .content .button-container {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 30px;
+        }
+
+        .content .button-section {
+            flex: 1;
+            text-align: center;
+        }
+
+        .content .button-section h2 {
+            margin-bottom: 20px;
+        }
+
+        .content button {
+            background-color: blue;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        .content button:hover {
+            background-color: darkblue;
+        }
+
+        .image-container {
+            position: relative;
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .image-container img {
+            width: 100%;
+            max-width: 1500px;
+            height: auto;
+        }
+
+        .image-container .overlay-text {
+            position: fixed;
+            top: 50%;
+            left: 80%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 94, 255, 0.5);
+            padding: 10px 50px;
+            border-radius: 5px;
+            font-size: 50px;
+        }
+    </style>
     <script type="module">
         // Importamos funciones de FIREBASE
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-app.js";
@@ -23,37 +120,41 @@
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const analytics = getAnalytics(app);
-      </script>
-<header>
-    <img src="logo_ula.png" alt="Logo de la Universidad">
-    <!-- Otro contenido de la cabecera -->
-</header>
-
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reserva de Estacionamiento Universitario</title>
-    <link rel="stylesheet" href="src/style.css">
+    </script>
 </head>
 <body>
-    <h1>Estacionamientos Chuyaca - Meyer </h1>
-    <form id="reservaForm">
-        <label for="nombre">Nombre:</label>
-        <input type="text" id="nombre" name="nombre" required>
-        
-        <label for="placa">Número de Placa:</label>
-        <input type="text" id="placa" name="placa" required>
-        
-        <label for="fecha">Fecha de Reserva:</label>
-        <input type="date" id="fecha" name="fecha" required>
-        
-        <button type="submit">Reservar Estacionamiento</button>
-    </form>
-    
-    <div id="mensajeReserva"></div>
-    
-    <script src="src/script.js"></script>
+    <div class="navbar">
+        <img src="logo_ula.png" alt="Logo">
+        <div class="nav-buttons">
+            <button>Ingresar</button>
+            <button>Registro</button>
+            <button>Ayuda</button>
+        </div>
+    </div>
+    <div class="content">
+        <div class="image-container">
+            <img src="parking_image.jpg" alt="Parking Image">
+            <div class="overlay-text">Estacionamientos Disponibles: 000</div>
+        </div>
+        <div class="button-container">
+            <div class="button-section">
+                <button onclick="visit()">Usuario Visita</button>
+            </div>
+            <div class="button-section">
+                <button onclick="location.href='portada.html'">Usuario Ulagos</button>
+            </div>
+        </div>
+    </div>
+
     <script src="app.js"></script>
+    <script>
+        function visit() {
+            alert("Visitor clicked");
+        }
+
+        function frequent() {
+            alert("Frequent user clicked");
+        }
+    </script>
 </body>
 </html>
-
-
