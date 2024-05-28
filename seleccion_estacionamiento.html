@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seleccionar Lugar de Estacionamiento</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+
+        form {
+            margin: 20px auto;
+            padding: 10px;
+            border: 1px solid #ccc;
+            width: 50%;
+            max-width: 300px;
+        }
+
+        select {
+            width: 100%;
+            padding: 5px;
+            margin: 10px 0;
+        }
+
+        input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <h1>Selecciona tu lugar de estacionamiento:</h1>
+    <form>
+        <label for="asiento">Selecciona tu asiento:</label>
+        <select id="asiento" name="asiento">
+            <!-- Generar 30 opciones de asientos -->
+            <option value="A1">A1</option>
+            <option value="A2">A2</option>
+            <option value="A3">A3</option>
+            <option value="A4">A4</option>
+            <option value="A5">A5</option>
+            <option value="A6">A6</option>
+            <option value="A7">A7</option>
+            <option value="A8">A8</option>
+            <option value="A9">A9</option>
+            <option value="A10">A10</option>
+            <option value="A11">A11</option>
+            <option value="A12">A12</option>
+            <option value="A13">A13</option>
+            <option value="A14">A14</option>
+            <option value="A15">A15</option>
+            <option value="A16">A16</option>
+            <option value="A17">A17</option>
+            <option value="A18">A18</option>
+            <option value="A19">A19</option>
+            <option value="A20">A20</option>
+            <option value="A21">A21</option>
+            <option value="A22">A22</option>
+            <option value="A23">A23</option>
+            <option value="A24">A24</option>
+            <option value="A25">A25</option>
+            <option value="A26">A26</option>
+            <option value="A27">A27</option>
+            <option value="A28">A28</option>
+            <option value="A29">A29</option>
+            <option value="A30">A30</option>
+
+        </select>
+        <br>
+        <input type="submit" value="Reservar Asiento">
+    </form>
+
+    <script>
+        // Array para almacenar los asientos seleccionados
+        let asientosSeleccionados = [];
+
+        // Evento al enviar el formulario
+        document.querySelector('form').addEventListener('submit', function(event) {
+            event.preventDefault(); // Evitar envío del formulario
+
+            const asientoSeleccionado = document.getElementById('asiento').value;
+
+            if (!asientosSeleccionados.includes(asientoSeleccionado)) {
+                asientosSeleccionados.push(asientoSeleccionado);
+                alert('Asiento seleccionado: ' + asientoSeleccionado);
+            } else {
+                alert('Este estacionamiento ya ha sido seleccionado. Por favor, elige otro.');
+            }
+        });
+    </script>
+</body>
+</html>
