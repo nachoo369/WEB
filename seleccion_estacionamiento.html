@@ -7,10 +7,78 @@
     <style>
         body {
             font-family: Arial, sans-serif;
+            background-color: white;
+            margin: 0;
+            padding: 0;
             text-align: center;
         }
 
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #0055B7;
+            padding: 10px 20px;
+            color: white;
+        }
+
+        .navbar img {
+            height: 50px;
+        }
+
+        .navbar .nav-buttons {
+            display: flex;
+        }
+
+        .navbar .nav-buttons button {
+            background-color: white;
+            color: blue;
+            border: none;
+            padding: 10px 20px;
+            margin-left: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .navbar .nav-buttons button:hover {
+            background-color: lightgray;
+        }
+
+        .content {
+            text-align: center;
+            padding: 50px;
+        }
+
+        .rectangle {
+            background-color: lightgray;
+            padding: 20px;
+            margin: 20px auto;
+            width: 50%;
+            border-radius: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .rectangle button {
+            background-color: blue;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            margin: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        .rectangle button:hover {
+            background-color: darkblue;
+        }
+
         form {
+            display: none;
             margin: 20px auto;
             padding: 10px;
             border: 1px solid #ccc;
@@ -35,63 +103,87 @@
         input[type="submit"]:hover {
             background-color: #45a049;
         }
+
+        h1 {
+            color: blue;
+        }
     </style>
 </head>
 <body>
-    <h1>Selecciona tu lugar de estacionamiento:</h1>
-    <form>
-        <label for="asiento">Selecciona tu asiento:</label>
-        <select id="asiento" name="asiento">
-            <!-- Generar 30 opciones de asientos -->
-            <option value="A1">A1</option>
-            <option value="A2">A2</option>
-            <option value="A3">A3</option>
-            <option value="A4">A4</option>
-            <option value="A5">A5</option>
-            <option value="A6">A6</option>
-            <option value="A7">A7</option>
-            <option value="A8">A8</option>
-            <option value="A9">A9</option>
-            <option value="A10">A10</option>
-            <option value="A11">A11</option>
-            <option value="A12">A12</option>
-            <option value="A13">A13</option>
-            <option value="A14">A14</option>
-            <option value="A15">A15</option>
-            <option value="A16">A16</option>
-            <option value="A17">A17</option>
-            <option value="A18">A18</option>
-            <option value="A19">A19</option>
-            <option value="A20">A20</option>
-            <option value="A21">A21</option>
-            <option value="A22">A22</option>
-            <option value="A23">A23</option>
-            <option value="A24">A24</option>
-            <option value="A25">A25</option>
-            <option value="A26">A26</option>
-            <option value="A27">A27</option>
-            <option value="A28">A28</option>
-            <option value="A29">A29</option>
-            <option value="A30">A30</option>
-
-        </select>
-        <br>
-        <input type="submit" value="Reservar Asiento">
-    </form>
+    <div class="navbar">
+        <img src="logo_ula.png" alt="Logo" onclick="location.href='/'">
+        <div class="nav-buttons">
+            <button onclick="location.href='login.html'">Ingresar</button>
+            <button onclick="location.href='registro_ulagos.html'">Registro</button>
+            <button onclick="location.href='ayuda.html'">Ayuda</button>
+        </div>
+    </div>
+    <div class="content">
+        <h1>Selecciona tu estacionamiento</h1>
+        <div class="rectangle">
+            <button onclick="mostrarFormulario()">Estacionamiento 1</button>
+            <button onclick="mostrarFormulario()">Estacionamiento 2</button>
+            <button onclick="mostrarFormulario()">Estacionamiento 3</button>
+            <button onclick="mostrarFormulario()">Estacionamiento 4</button>
+        </div>
+        <form id="reservaForm">
+            <label for="asiento">Selecciona tu Estacionamiento:</label>
+            <select id="asiento" name="asiento">
+                <!-- Generar 30 opciones de estacionamientos -->
+                <option value="A1">A1</option>
+                <option value="A2">A2</option>
+                <option value="A3">A3</option>
+                <option value="A4">A4</option>
+                <option value="A5">A5</option>
+                <option value="A6">A6</option>
+                <option value="A7">A7</option>
+                <option value="A8">A8</option>
+                <option value="A9">A9</option>
+                <option value="A10">A10</option>
+                <option value="A11">A11</option>
+                <option value="A12">A12</option>
+                <option value="A13">A13</option>
+                <option value="A14">A14</option>
+                <option value="A15">A15</option>
+                <option value="A16">A16</option>
+                <option value="A17">A17</option>
+                <option value="A18">A18</option>
+                <option value="A19">A19</option>
+                <option value="A20">A20</option>
+                <option value="A21">A21</option>
+                <option value="A22">A22</option>
+                <option value="A23">A23</option>
+                <option value="A24">A24</option>
+                <option value="A25">A25</option>
+                <option value="A26">A26</option>
+                <option value="A27">A27</option>
+                <option value="A28">A28</option>
+                <option value="A29">A29</option>
+                <option value="A30">A30</option>
+            </select>
+            <br>
+            <input type="submit" value="Reservar Estacionamiento">
+        </form>
+    </div>
 
     <script>
-        // Array para almacenar los asientos seleccionados
-        let asientosSeleccionados = [];
+        // Array para almacenar los estacionamientos seleccionados
+        let estacionamientosSeleccionados = [];
+
+        // Función para mostrar el formulario
+        function mostrarFormulario() {
+            document.getElementById('reservaForm').style.display = 'block';
+        }
 
         // Evento al enviar el formulario
-        document.querySelector('form').addEventListener('submit', function(event) {
+        document.getElementById('reservaForm').addEventListener('submit', function(event) {
             event.preventDefault(); // Evitar envío del formulario
 
-            const asientoSeleccionado = document.getElementById('asiento').value;
+            const estacionamientoSeleccionado = document.getElementById('asiento').value;
 
-            if (!asientosSeleccionados.includes(asientoSeleccionado)) {
-                asientosSeleccionados.push(asientoSeleccionado);
-                alert('Asiento seleccionado: ' + asientoSeleccionado);
+            if (!estacionamientosSeleccionados.includes(estacionamientoSeleccionado)) {
+                estacionamientosSeleccionados.push(estacionamientoSeleccionado);
+                alert('Estacionamiento seleccionado: ' + estacionamientoSeleccionado);
             } else {
                 alert('Este estacionamiento ya ha sido seleccionado. Por favor, elige otro.');
             }

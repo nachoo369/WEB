@@ -10,6 +10,10 @@
             background-color: white;
             margin: 0;
             padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
         }
 
         .navbar {
@@ -19,6 +23,9 @@
             background-color: #0055B7;
             padding: 10px 20px;
             color: white; /* Añadido: color de texto blanco */
+            width: 100%;
+            position: absolute;
+            top: 0;
         }
 
         .navbar img {
@@ -43,42 +50,77 @@
         .navbar .nav-buttons button:hover {
             background-color: lightgray;
         }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            width: 100%;
+            flex-direction: column;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            max-width: 300px;
+        }
+
+        form label {
+            color: green;
+        }
+
+        form input {
+            background-color: #f2f2f2;
+            padding: 5px;
+            margin-bottom: 10px;
+        }
+
+        form button {
+            background-color: blue;
+            color: white;
+            padding: 8px 12px;
+            border: none;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
     <div class="navbar">
-            <img src="logo_ula.png" alt="Logo" onclick="location.href='index.html'">
-            <div class="nav-buttons">
-                <button onclick="location.href='login.html'">Ingresar</button>
-                <button onclick="location.href='registro_ulagos.html'">Registro</button>
-                <button onclick="location.href='ayuda.html'">Ayuda</button>
-            </div>
+        <img src="logo_ula.png" alt="Logo" onclick="location.href='index.html'">
+        <div class="nav-buttons">
+            <button onclick="location.href='login.html'">Ingresar</button>
+            <button onclick="location.href='registro_ulagos.html'">Registro</button>
+            <button onclick="location.href='ayuda.html'">Ayuda</button>
+        </div>
     </div>
 
-    <h1 style="color: blue; text-align: center;">Estacionamientos Chuyaca - Meyer </h1>
-    <div style="text-align: center;">
-        <form id="reservaForm" style="display: inline-block; text-align: left; max-width: 300px;">
-            <label for="nombre" style="color: green;">Nombre:</label>
-            <input type="text" id="nombre" name="nombre" required style="background-color: #f2f2f2; padding: 5px; margin-bottom: 10px;">
+    <div class="container">
+        <h1 style="color: blue;">Estacionamientos Chuyaca - Meyer </h1>
+        <form id="reservaForm">
+            <label for="nombre">Nombre:</label>
+            <input type="text" id="nombre" name="nombre" required>
             
-            <label for="placa" style="color: green;">Número de Placa:</label>
-            <input type="text" id="placa" name="placa" required style="background-color: #f2f2f2; padding: 5px; margin-bottom: 10px;">
+            <label for="placa">Número de Placa:</label>
+            <input type="text" id="placa" name="placa" required>
             
-            <label for="color" style="color: green;">Color del Auto:</label>
-            <input type="text" id="color" name="color" required style="background-color: #f2f2f2; padding: 5px; margin-bottom: 10px;">
+            <label for="color">Color del Auto:</label>
+            <input type="text" id="color" name="color" required>
             
-            <label for="telefono" style="color: green;">Teléfono:</label>
-            <input type="tel" id="telefono" name="telefono" style="background-color: #f2f2f2; padding: 5px; margin-bottom: 10px;">
+            <label for="telefono">Teléfono:</label>
+            <input type="tel" id="telefono" name="telefono">
             
-            <label for="fecha" style="color: green;">Fecha de Reserva:</label>
-            <input type="date" id="fecha" name="fecha" required style="background-color: #f2f2f2; padding: 5px; margin-bottom: 10px;">
+            <label for="fecha">Fecha de Reserva:</label>
+            <input type="date" id="fecha" name="fecha" required>
             
-            <button type="submit" style="background-color: blue; color: white; padding: 8px 12px; border: none; cursor: pointer;">Selecciona Lugar</button>
+            <a href="seleccion_estacionamiento.html">
+                <button type="button">Selecciona Lugar</button>
+            </a>
         </form>
+        
+        <div id="mensajeReserva"></div>
     </div>
-    
-    <div id="mensajeReserva" style="text-align: center; margin-top: 20px;"></div>
-    
+
     <script src="src/script.js"></script>
     <script src="app.js"></script>
 </body>
