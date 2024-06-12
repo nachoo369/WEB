@@ -104,7 +104,8 @@
         #reservaForm input[type="text"],
         #reservaForm input[type="tel"],
         #reservaForm input[type="date"],
-        #reservaForm input[type="email"] {
+        #reservaForm input[type="email"],
+        #reservaForm input[type="password"] {
             background-color: #f2f2f2;
             padding: 5px;
             margin-bottom: 10px;
@@ -193,7 +194,7 @@
     <div class="content">
         <h1 style="color: blue;">Estacionamientos Chuyaca - Meyer</h1>
         <form id="reservaForm" onsubmit="registrar(event)">
-            <label for="nombre">Nombre:</label>
+            <label for="nombre">Nombre y Apellido:</label>
             <input type="text" id="nombre" name="nombre" required>
             
             <label for="placa">Número de Placa:</label>
