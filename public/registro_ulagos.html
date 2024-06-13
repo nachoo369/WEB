@@ -18,7 +18,7 @@
             align-items: center;
             background-color: #0055B7;
             padding: 10px 20px;
-            color: white; 
+            color: white; /* Añadido: color de texto blanco */
         }
 
         .navbar img {
@@ -69,8 +69,8 @@
             position: relative;
             text-align: center;
             color: white;
-            background-color: blue; 
-            padding: 20px; 
+            background-color: blue; /* Añadido: fondo azul */
+            padding: 20px; /* Añadido: espacio de relleno */
         }
 
         .image-container img {
@@ -89,12 +89,12 @@
             border-radius: 5px;
         }
 
-        
+        /* Añadido: Estilos para el formulario */
         #reservaForm {
             display: flex;
             flex-direction: column;
             max-width: 300px;
-            margin: 0 auto; 
+            margin: 0 auto; /* Centra el formulario horizontalmente */
         }
 
         #reservaForm label {
@@ -117,12 +117,12 @@
             padding: 8px 12px;
             border: none;
             cursor: pointer;
-            margin-top: 20px; 
+            margin-top: 20px; /* Espacio adicional arriba del botón */
         }
 
         #mensajeReserva {
             text-align: center;
-            margin-top: 20px; 
+            margin-top: 20px; /* Espacio adicional arriba del mensaje */
         }
     </style>
     <script type="module">
@@ -130,7 +130,7 @@
         import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-auth.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-analytics.js";
 
-        // CONEXION FIREBASE
+        // Tu configuración de Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyDPQHtLTQCPoQSAROQHKpFcDN-xuKkYlzg",
             authDomain: "tallerii-4104d.firebaseapp.com",
@@ -149,7 +149,7 @@
         // Hacer Firebase accesible globalmente
         window.firebaseAuth = auth;
 
-        // Funcion para registrar al usuario
+        // Función para registrar al usuario
         window.registrar = function(event) {
             event.preventDefault();
 
@@ -195,40 +195,73 @@
         <h1 style="color: blue;">Estacionamientos Chuyaca - Meyer</h1>
         <form id="reservaForm" onsubmit="registrar(event)">
             <label for="nombre">Nombre y Apellido:</label>
-            <input type="text" id="nombre" name="nombre" required>
-            
-            <label for="placa">Número de Placa:</label>
-            <input type="text" id="placa" name="placa" required>
-            
-            <label for="color">Color del Auto:</label>
-            <input type="text" id="color" name="color" required>
-            
-            <label for="telefono">Teléfono:</label>
-            <input type="tel" id="telefono" name="telefono">
-            
-            <label for="fecha">Fecha de Reserva:</label>
-            <input type="date" id="fecha" name="fecha" required>
+            <input type="text" id="nombre" name="nombre" pattern="[A-Za-zÁÉÍÓÚáéíóúÜüÑñ\s]+ [A-Za-zÁÉÍÓÚáéíóúÜüÑñ\s]+" title="Ingrese un nombre y apellido válido (ej. Diego Gallegos)" required>
+    
+            <label for="telefono">Teléfono (9XXXXXXXX):</label>
+            <input type="tel" id="telefono" name="telefono" pattern="9[0-9]{8}" title="Ingrese un número de teléfono válido (ej. 912345678)" required>
             
             <label for="correo">Correo Electrónico (solo @ulagos.cl o @alumnos.ulagos.cl):</label>
-            <input type="email" id="correo" name="correo" required oninput="validarCorreo()">
-            
-            <label for="contrasena">Constraseña:</label>
-            <input type="password" id="contrasena" name="contrasena" required>
-            
+            <input type="email" id="correo" name="correo" required>
+    
+            <label for="contrasena">Contraseña (Mayúscula, minúscula, números y signo):</label>
+            <input type="password" id="contrasena" name="contrasena" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*\W).{8,}$" required>
+    
+            <label for="confirmarContrasena">Confirmar Contraseña:</label>
+            <input type="password" id="confirmarContrasena" name="confirmarContrasena" required oninput="validarConfirmacionContrasena()">
+    
             <script>
-                function validarCorreo() {
-                    const inputCorreo = document.getElementById('correo');
-                    const correo = inputCorreo.value;
-                    if (!/^[a-zA-Z0-9._%+-]+@(ulagos\.cl|alumnos\.ulagos\.cl)$/.test(correo)) {
-                        inputCorreo.setCustomValidity('Por favor, ingrese un correo con dominio @ulagos.cl o @alumnos.ulagos.cl');
+                function validarContrasena() {
+                    const inputContrasena = document.getElementById('contrasena');
+                    const contrasena = inputContrasena.value;
+                    const contrasenaPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*\W).{8,}$/;
+    
+                    if (!contrasenaPattern.test(contrasena)) {
+                        inputContrasena.setCustomValidity('La contraseña debe incluir al menos una mayúscula, una minúscula, un número y un carácter especial');
                     } else {
-                        inputCorreo.setCustomValidity('');
+                        inputContrasena.setCustomValidity('');
                     }
                 }
-            </script>        
-            <button onclick="location.href='seleccion_estacionamiento.html'" type="submit" >Registrar</button>
+    
+                function validarConfirmacionContrasena() {
+                    const contrasena = document.getElementById('contrasena').value;
+                    const confirmarContrasena = document.getElementById('confirmarContrasena').value;
+    
+                    if (contrasena !== confirmarContrasena) {
+                        document.getElementById('confirmarContrasena').setCustomValidity('Las contraseñas no coinciden');
+                    } else {
+                        document.getElementById('confirmarContrasena').setCustomValidity('');
+                    }
+                }
+    
+                function validarNombre() {
+                    const inputNombre = document.getElementById('nombre');
+                    const nombre = inputNombre.value;
+                    const nombrePattern = /^[A-Za-zÁÉÍÓÚáéíóúÜüÑñ\s]+ [A-Za-zÁÉÍÓÚáéíóúÜüÑñ\s]+$/;
+    
+                    if (!nombrePattern.test(nombre)) {
+                        inputNombre.setCustomValidity('Por favor, ingrese un nombre y apellido válido (ej. Diego Gallegos)');
+                    } else {
+                        inputNombre.setCustomValidity('');
+                    }
+                }
+    
+                function validarAntesDeRegistrar() {
+                    validarNombre();
+                    validarContrasena();
+                    validarConfirmacionContrasena();
+                    if (document.getElementById('nombre').checkValidity() && document.getElementById('contrasena').checkValidity() && document.getElementById('confirmarContrasena').checkValidity()) {
+                        // Aquí puedes redirigir al usuario a la página deseada
+                        alert('Se ha registrado correctamente. Redirigiendo...');
+                        window.location.href = 'seleccion_estacionamiento.html';
+                    }
+                }
+            </script>
+    
+            <button type="button" onclick="validarAntesDeRegistrar()">Registrar</button>
+        </form>
+    </div>    
         </form>        
         <div id="mensajeReserva"></div>
-    </div>
+    </div>    
 </body>
 </html>
