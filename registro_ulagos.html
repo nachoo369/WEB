@@ -18,7 +18,7 @@
             align-items: center;
             background-color: #0055B7;
             padding: 10px 20px;
-            color: white; /* Añadido: color de texto blanco */
+            color: white; 
         }
 
         .navbar img {
@@ -69,8 +69,8 @@
             position: relative;
             text-align: center;
             color: white;
-            background-color: blue; /* Añadido: fondo azul */
-            padding: 20px; /* Añadido: espacio de relleno */
+            background-color: blue; 
+            padding: 20px; 
         }
 
         .image-container img {
@@ -89,12 +89,12 @@
             border-radius: 5px;
         }
 
-        /* Añadido: Estilos para el formulario */
+        
         #reservaForm {
             display: flex;
             flex-direction: column;
             max-width: 300px;
-            margin: 0 auto; /* Centra el formulario horizontalmente */
+            margin: 0 auto; 
         }
 
         #reservaForm label {
@@ -117,12 +117,12 @@
             padding: 8px 12px;
             border: none;
             cursor: pointer;
-            margin-top: 20px; /* Espacio adicional arriba del botón */
+            margin-top: 20px; 
         }
 
         #mensajeReserva {
             text-align: center;
-            margin-top: 20px; /* Espacio adicional arriba del mensaje */
+            margin-top: 20px; 
         }
     </style>
     <script type="module">
@@ -130,7 +130,7 @@
         import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-auth.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-analytics.js";
 
-        // Tu configuración de Firebase
+        // CONEXION FIREBASE
         const firebaseConfig = {
             apiKey: "AIzaSyDPQHtLTQCPoQSAROQHKpFcDN-xuKkYlzg",
             authDomain: "tallerii-4104d.firebaseapp.com",
@@ -149,7 +149,7 @@
         // Hacer Firebase accesible globalmente
         window.firebaseAuth = auth;
 
-        // Función para registrar al usuario
+        // Funcion para registrar al usuario
         window.registrar = function(event) {
             event.preventDefault();
 

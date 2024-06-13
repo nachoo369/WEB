@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estacionamiento ULagos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: white;
+            margin: 0;
+            padding: 0;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #0055B7;
+            padding: 10px 20px;
+            color: white; 
+        }
+
+        .navbar img {
+            height: 50px;
+        }
+
+        .navbar .nav-buttons {
+            display: flex;
+        }
+
+        .navbar .nav-buttons button {
+            background-color: white;
+            color: blue;
+            border: none;
+            padding: 10px 20px;
+            margin-left: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .navbar .nav-buttons button:hover {
+            background-color: lightgray;
+        }
+
+        .content {
+            text-align: center;
+            padding: 50px;
+        }
+
+        .content button {
+            background-color: blue;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            margin: 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        .content button:hover {
+            background-color: darkblue;
+        }
+
+        .image-container {
+            position: relative;
+            text-align: center;
+            color: white;
+            background-color: blue; 
+            padding: 20px; 
+        }
+
+        .image-container img {
+            width: 100%;
+            max-width: 1500px;
+            height: auto;
+        }
+
+        .image-container .overlay-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 10px 20px;
+            border-radius: 5px;
+        }
+
+        
+        #reservaForm {
+            display: flex;
+            flex-direction: column;
+            max-width: 300px;
+            margin: 0 auto; 
+        }
+
+        #reservaForm label {
+            color: green;
+        }
+
+        #reservaForm input[type="text"],
+        #reservaForm input[type="tel"],
+        #reservaForm input[type="date"],
+        #reservaForm input[type="email"],
+        #reservaForm input[type="password"] {
+            background-color: #f2f2f2;
+            padding: 5px;
+            margin-bottom: 10px;
+        }
+
+        #reservaForm button[type="submit"] {
+            background-color: blue;
+            color: white;
+            padding: 8px 12px;
+            border: none;
+            cursor: pointer;
+            margin-top: 20px; 
+        }
+
+        #mensajeReserva {
+            text-align: center;
+            margin-top: 20px; 
+        }
+    </style>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-auth.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-analytics.js";
+
+        // CONEXION FIREBASE
+        const firebaseConfig = {
+            apiKey: "AIzaSyDPQHtLTQCPoQSAROQHKpFcDN-xuKkYlzg",
+            authDomain: "tallerii-4104d.firebaseapp.com",
+            projectId: "tallerii-4104d",
+            storageBucket: "tallerii-4104d.appspot.com",
+            messagingSenderId: "809208530029",
+            appId: "1:809208530029:web:e823b1a85e167ec9cbab64",
+            measurementId: "G-0E1TRG4GFF"
+        };
+
+        // Inicializar Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const auth = getAuth(app);
+
+        // Hacer Firebase accesible globalmente
+        window.firebaseAuth = auth;
+
+        // Funcion para registrar al usuario
+        window.registrar = function(event) {
+            event.preventDefault();
+
+            var nombre = document.getElementById("nombre").value;
+            var placa = document.getElementById("placa").value;
+            var color = document.getElementById("color").value;
+            var telefono = document.getElementById("telefono").value;
+            var fecha = document.getElementById("fecha").value;
+            var correo = document.getElementById("correo").value;
+            var contrasena = document.getElementById("contrasena").value;
+
+            var auth = window.firebaseAuth;
+            if (!auth) {
+                console.error("Firebase Auth no está inicializado correctamente.");
+                return;
+            }
+
+            createUserWithEmailAndPassword(auth, correo, contrasena)
+                .then((userCredential) => {
+                    var user = userCredential.user;
+                    console.log("Usuario registrado:", user);
+                    document.getElementById("mensajeReserva").textContent = "Usuario registrado con éxito.";
+                })
+                .catch((error) => {
+                    var errorCode = error.code;
+                    var errorMessage = error.message;
+                    console.error("Error al registrar el usuario:", errorCode, errorMessage);
+                    document.getElementById("mensajeReserva").textContent = `Error: ${errorMessage}`;
+                });
+        }
+    </script>
+</head>
+<body>
+    <div class="navbar">
+        <img src="logo_ula.png" alt="Logo" onclick="location.href='index.html'">
+        <div class="nav-buttons">
+            <button onclick="location.href='login.html'">Ingresar</button>
+            <button onclick="location.href='registro_ulagos.html'">Registro</button>
+            <button onclick="location.href='ayuda.html'">Ayuda</button>
+        </div>
+    </div>
+    <div class="content">
+        <h1 style="color: blue;">Estacionamientos Chuyaca - Meyer</h1>
+        <form id="reservaForm" onsubmit="registrar(event)">
+            <label for="nombre">Nombre y Apellido:</label>
+            <input type="text" id="nombre" name="nombre" required>
+            
+            <label for="placa">Número de Placa:</label>
+            <input type="text" id="placa" name="placa" required>
+            
+            <label for="color">Color del Auto:</label>
+            <input type="text" id="color" name="color" required>
+            
+            <label for="telefono">Teléfono:</label>
+            <input type="tel" id="telefono" name="telefono">
+            
+            <label for="fecha">Fecha de Reserva:</label>
+            <input type="date" id="fecha" name="fecha" required>
+            
+            <label for="correo">Correo Electrónico (solo @ulagos.cl o @alumnos.ulagos.cl):</label>
+            <input type="email" id="correo" name="correo" required oninput="validarCorreo()">
+            
+            <label for="contrasena">Constraseña:</label>
+            <input type="password" id="contrasena" name="contrasena" required>
+            
+            <script>
+                function validarCorreo() {
+                    const inputCorreo = document.getElementById('correo');
+                    const correo = inputCorreo.value;
+                    if (!/^[a-zA-Z0-9._%+-]+@(ulagos\.cl|alumnos\.ulagos\.cl)$/.test(correo)) {
+                        inputCorreo.setCustomValidity('Por favor, ingrese un correo con dominio @ulagos.cl o @alumnos.ulagos.cl');
+                    } else {
+                        inputCorreo.setCustomValidity('');
+                    }
+                }
+            </script>        
+            <button onclick="location.href='seleccion_estacionamiento.html'" type="submit" >Registrar</button>
+        </form>        
+        <div id="mensajeReserva"></div>
+    </div>
+</body>
+</html>
