@@ -111,6 +111,7 @@
             margin-bottom: 10px;
         }
 
+        #reservaForm button[type="button"],
         #reservaForm button[type="submit"] {
             background-color: blue;
             color: white;
@@ -118,6 +119,14 @@
             border: none;
             cursor: pointer;
             margin-top: 20px; /* Espacio adicional arriba del botón */
+            border-radius: 5px;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        #reservaForm button[type="button"]:hover,
+        #reservaForm button[type="submit"]:hover {
+            background-color: darkblue;
         }
 
         #mensajeReserva {
@@ -125,62 +134,7 @@
             margin-top: 20px; /* Espacio adicional arriba del mensaje */
         }
     </style>
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-auth.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-analytics.js";
-
-        // Tu configuración de Firebase
-        const firebaseConfig = {
-            apiKey: "AIzaSyDPQHtLTQCPoQSAROQHKpFcDN-xuKkYlzg",
-            authDomain: "tallerii-4104d.firebaseapp.com",
-            projectId: "tallerii-4104d",
-            storageBucket: "tallerii-4104d.appspot.com",
-            messagingSenderId: "809208530029",
-            appId: "1:809208530029:web:e823b1a85e167ec9cbab64",
-            measurementId: "G-0E1TRG4GFF"
-        };
-
-        // Inicializar Firebase
-        const app = initializeApp(firebaseConfig);
-        const analytics = getAnalytics(app);
-        const auth = getAuth(app);
-
-        // Hacer Firebase accesible globalmente
-        window.firebaseAuth = auth;
-
-        // Función para registrar al usuario
-        window.registrar = function(event) {
-            event.preventDefault();
-
-            var nombre = document.getElementById("nombre").value;
-            var placa = document.getElementById("placa").value;
-            var color = document.getElementById("color").value;
-            var telefono = document.getElementById("telefono").value;
-            var fecha = document.getElementById("fecha").value;
-            var correo = document.getElementById("correo").value;
-            var contrasena = document.getElementById("contrasena").value;
-
-            var auth = window.firebaseAuth;
-            if (!auth) {
-                console.error("Firebase Auth no está inicializado correctamente.");
-                return;
-            }
-
-            createUserWithEmailAndPassword(auth, correo, contrasena)
-                .then((userCredential) => {
-                    var user = userCredential.user;
-                    console.log("Usuario registrado:", user);
-                    document.getElementById("mensajeReserva").textContent = "Usuario registrado con éxito.";
-                })
-                .catch((error) => {
-                    var errorCode = error.code;
-                    var errorMessage = error.message;
-                    console.error("Error al registrar el usuario:", errorCode, errorMessage);
-                    document.getElementById("mensajeReserva").textContent = `Error: ${errorMessage}`;
-                });
-        }
-    </script>
+    <script src="firebase-config.js" type="module"></script>
 </head>
 <body>
     <div class="navbar">
@@ -250,18 +204,16 @@
                     validarContrasena();
                     validarConfirmacionContrasena();
                     if (document.getElementById('nombre').checkValidity() && document.getElementById('contrasena').checkValidity() && document.getElementById('confirmarContrasena').checkValidity()) {
-                        // Aquí puedes redirigir al usuario a la página deseada
-                        alert('Se ha registrado correctamente. Redirigiendo...');
-                        window.location.href = 'seleccion_estacionamiento.html';
+                        // Ejecutar la función de registrar definida globalmente
+                        registrar(event);
                     }
                 }
             </script>
-    
+            <script src="firebase-config.js" type="module"></script>
+
             <button type="button" onclick="validarAntesDeRegistrar()">Registrar</button>
         </form>
-    </div>    
-        </form>        
         <div id="mensajeReserva"></div>
-    </div>    
+    </div>
 </body>
 </html>

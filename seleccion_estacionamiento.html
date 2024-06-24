@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro de Vehículo</title>
+    <link rel="stylesheet" href="styles.css">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -12,37 +13,42 @@
             padding: 0;
             text-align: center;
         }
-
-        .navbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: #0055B7;
-            padding: 10px 20px;
-            color: white;
+        .dropdown {
+            position: relative;
+            display: inline-block;
+            margin-left: 20px; /* Ajusta según tu diseño */
+            /* Alineación hacia la izquierda */
+            text-align: left;
         }
 
-        .navbar img {
-            height: 50px;
-        }
-
-        .navbar .nav-buttons {
-            display: flex;
-        }
-
-        .navbar .nav-buttons button {
-            background-color: white;
-            color: blue;
-            border: none;
-            padding: 10px 20px;
-            margin-left: 10px;
-            cursor: pointer;
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(82, 80, 80, 0);
+            z-index: 1;
+            padding: 5px 0;
             border-radius: 5px;
-            transition: background-color 0.3s;
+            left: -160px; /* Ajusta el valor para alinear hacia la izquierda */
         }
 
-        .navbar .nav-buttons button:hover {
-            background-color: lightgray;
+        .dropdown-content a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            cursor: pointer;
+        }
+
+        .dropdown-content a:hover {background-color: #f1f1f1}
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .dropdown:hover .dropbtn {
+            background-color: #ffffff13;
         }
 
         .content {
@@ -53,7 +59,7 @@
         .add-vehicle-btn,
         .campus-btn,
         .third-btn {
-            background-color: blue;
+            background-color: rgb(245, 245, 245);
             color: white;
             border: none;
             padding: 15px 30px;
@@ -185,15 +191,24 @@
             background-color: red;
         }
     </style>
+    <script src="firebase-au.js"></script>
 </head>
 <body>
     <div class="navbar">
         <img src="logo_ula.png" alt="Logo" onclick="location.href='index.html'">
         <div class="nav-buttons">
-            <button onclick="location.href='login.html'">Ingresar</button>
-            <button onclick="location.href='registro_ulagos.html'">Registro</button>
-            <button onclick="location.href='ayuda.html'">Ayuda</button>
+            <button id="user-name" style="display: none;"></button>
+            <!-- Menú desplegable para el correo -->
+            <div class="dropdown">
+                <button class="dropbtn" onclick="toggleDropdown('email-options')">☰</button>
+                <div id="email-options" class="dropdown-content">
+                    <a href="#">Historial de Reservas</a>
+                    <a href="#">Reservar Estacionamiento</a>
+                    <a href="#" onclick="logout()">Cerrar Sesión</a>
+                </div>
+            </div>
         </div>
+        <div class="menu-icon" onclick="toggleMenu()">☰</div>
     </div>
 
     <div class="content">
@@ -378,6 +393,10 @@
                 campusModal.style.display = 'none';
             }
         }
+        
     </script>
+    <script src="navbar.js"></script>
+    <script src="firebase-au.js"></script>
+
 </body>
 </html>

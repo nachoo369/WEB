@@ -4,44 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Estacionamiento ULagos</title>
+    <link rel="stylesheet" href="styles.css">
     <style>
         body {
             font-family: Arial, sans-serif;
             background-color: white;
             margin: 0;
             padding: 0;
-        }
-
-        .navbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: #0055B7;
-            padding: 10px 20px;
-            color: white;
-        }
-
-        .navbar img {
-            height: 50px;
-        }
-
-        .navbar .nav-buttons {
-            display: flex;
-        }
-
-        .navbar .nav-buttons button {
-            background-color: white;
-            color: blue;
-            border: none;
-            padding: 10px 20px;
-            margin-left: 10px;
-            cursor: pointer;
-            border-radius: 5px;
-            transition: background-color 0.3s;
-        }
-
-        .navbar .nav-buttons button:hover {
-            background-color: lightgray;
         }
 
         .content {
@@ -151,9 +120,12 @@
                 .then((userCredential) => {
                     var user = userCredential.user;
                     console.log("Usuario iniciado:", user);
+                    sessionStorage.setItem('username', user.email); // Suponiendo que el nombre de usuario es el email
                     document.getElementById("mensajeLogin").textContent = "Inicio de sesión exitoso.";
+
                     // Redirigir a la página de selección de estacionamiento
                     window.location.href = 'seleccion_estacionamiento.html';
+
                 })
                 .catch((error) => {
                     console.error("Error al iniciar sesión:", error);
@@ -161,15 +133,23 @@
                 });
         }
     </script>
+    
 </head>
 <body>
     <div class="navbar">
         <img src="logo_ula.png" alt="Logo" onclick="location.href='index.html'">
         <div class="nav-buttons">
-            <button onclick="location.href='login.html'">Ingresar</button>
-            <button onclick="location.href='registro_ulagos.html'">Registro</button>
-            <button onclick="location.href='ayuda.html'">Ayuda</button>
+            <button id="user-name" style="display: none;"></button>
         </div>
+        <div class="menu-icon" onclick="toggleMenu()">☰</div>
+    </div>
+    <div id="menu" class="dropdown-menu" style="display: none;">
+        <button onclick="location.href='login.html'" id="login-btn">Ingresar</button>
+        <button onclick="location.href='registro_ulagos.html'" id="register-btn">Registrar</button>
+        <button onclick="location.href='ayuda.html'" id="help-btn">Ayuda</button>
+        <button onclick="location.href='reservar.html'" id="reserve-btn" style="display: none;">Reservar</button>
+        <button onclick="location.href='historial.html'" id="history-btn" style="display: none;">Historial</button>
+        <button onclick="logout()" id="logout-btn" style="display: none;">Cerrar Sesión</button>
     </div>
     <div class="content">
         <h1 style="color: blue;">Iniciar Sesión</h1>
@@ -188,5 +168,7 @@
             <a href="registro_ulagos.html">¿No tienes cuenta? Regístrate</a>
         </div>
     </div>
+    <script src="navbar.js"></script>
+    <script type="module" src="firebase-config.js"></script>
 </body>
 </html>
