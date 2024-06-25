@@ -20,7 +20,6 @@
             /* Alineación hacia la izquierda */
             text-align: left;
         }
-
         .dropdown-content {
             display: none;
             position: absolute;
@@ -30,9 +29,9 @@
             z-index: 1;
             padding: 5px 0;
             border-radius: 5px;
-            left: -160px; /* Ajusta el valor para alinear hacia la izquierda */
+            left: 0; /* Ajusta para que el menú aparezca al lado */
+            top: 50%; /* Ajusta la posición vertical según tu diseño */
         }
-
         .dropdown-content a {
             color: black;
             padding: 12px 16px;
@@ -190,6 +189,28 @@
         .parking-spot.occupied {
             background-color: red;
         }
+        #horariosModal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+            padding-top: 60px;
+        }
+
+        #horariosModal .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 400px;
+            border-radius: 10px;
+        }
     </style>
     <script src="firebase-au.js"></script>
 </head>
@@ -204,7 +225,7 @@
                 <div id="email-options" class="dropdown-content">
                     <a href="#">Historial de Reservas</a>
                     <a href="#">Reservar Estacionamiento</a>
-                    <a href="#" onclick="logout()">Cerrar Sesión</a>
+                    <a href="index.html" onclick="logout()">Cerrar Sesión</a>
                 </div>
             </div>
         </div>
@@ -254,149 +275,23 @@
             <div id="ubicacionCampus" class="campus-location"></div>
         </div>
     </div>
+        <div id="horariosModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="cerrarModalHorariosDisponibles()">&times;</span>
+            <label for="horario">Selecciona Horario:</label>
+            <select id="horario" name="horario">
+                <!-- Opciones de horario que serán rellenadas desde la base de datos -->
+            </select>
+            <button onclick="reservarHorario()">Reservar</button>
+        </div>
+    </div>
 
     <div id="parkingContainer" class="parking-container"></div>
 
-    <script>
-        function mostrarModal() {
-            document.getElementById('vehicleModal').style.display = 'block';
-        }
 
-        function cerrarModal() {
-            document.getElementById('vehicleModal').style.display = 'none';
-        }
-
-        function mostrarModalCampus() {
-            document.getElementById('campusModal').style.display = 'block';
-        }
-
-        function cerrarModalCampus() {
-            document.getElementById('campusModal').style.display = 'none';
-        }
-
-        document.getElementById('vehicleForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-
-            const marca = document.getElementById('marca').value;
-            const patente = document.getElementById('patente').value;
-            const color = document.getElementById('color').value;
-
-            if (/^[A-Z]{2,3}[0-9]{4}$/.test(patente)) {
-                alert('Vehículo registrado: ' + marca + ', ' + patente + ', ' + color);
-                agregarBotonVehiculo(marca, patente, color);
-                cerrarModal();
-                marcarComoFinalizado(document.querySelector('.add-vehicle-btn'), 'Finalizado');
-                mostrarInfoVehiculo(marca, color, patente);
-            } else {
-                alert('La patente ingresada no es válida. Debe ser en formato chileno (e.g., AB1234 o ABC123).');
-            }
-        });
-
-        function marcarComoFinalizado(button, text) {
-            button.classList.add('completed-btn');
-            button.innerText = text;
-        }
-
-        function agregarBotonVehiculo(marca, patente, color) {
-            const btn = document.createElement('button');
-            btn.innerHTML = 'Seleccionar Campus';
-            btn.className = 'campus-btn';
-            btn.onclick = mostrarModalCampus;
-            document.getElementById('vehiculosContainer').appendChild(btn);
-
-            btn.dataset.marca = marca;
-            btn.dataset.patente = patente;
-            btn.dataset.color = color;
-        }
-
-        function mostrarInfoVehiculo(marca, color, patente) {
-            const infoDiv = document.createElement('div');
-            infoDiv.innerHTML = `Usted ha registrado el vehículo ${marca} ${color} con patente ${patente}.`;
-            document.getElementById('vehicleInfoContainer').appendChild(infoDiv);
-        }
-
-        function mostrarUbicacionCampus() {
-            const campus = document.getElementById('campus').value;
-            const ubicacionCampusDiv = document.getElementById('ubicacionCampus');
-            ubicacionCampusDiv.innerHTML = '';
-
-            if (campus) {
-                let ubicacionTexto = '';
-                let ubicacionURL = '';
-        
-                if (campus === 'Chuyaca') {
-                    ubicacionTexto = 'Google Maps';
-                    ubicacionURL = 'https://maps.app.goo.gl/VYjxTXeeaQF2kmRz8';
-                } else if (campus === 'Meyer') {
-                    ubicacionTexto = 'Google Maps';
-                    ubicacionURL = 'https://maps.app.goo.gl/VYjxTXeeaQF2kmRz8';
-                }
-
-                const link = document.createElement('a');
-                link.textContent = ubicacionTexto;
-                link.href = ubicacionURL;
-                link.target = '_blank'; // Abre el enlace en una nueva pestaña/tab
-
-                const button = document.createElement('button');
-                button.textContent = 'Seleccionar esta ubicación';
-                button.onclick = function() {
-                    alert('Ubicación seleccionada: ' + campus);
-                    cerrarModalCampus();
-                    document.querySelector('.campus-btn').classList.add('completed-btn');
-                    document.querySelector('.campus-btn').innerText = 'Finalizado';
-                    mostrarTercerBoton(); // boton3
-                };
-
-                ubicacionCampusDiv.appendChild(link);
-                ubicacionCampusDiv.appendChild(button);
-            }
-        }
-
-        function mostrarTercerBoton() {
-            const tercerBtn = document.createElement('button');
-            tercerBtn.innerHTML = 'Seleccionar Estacionamiento';
-            tercerBtn.className = 'third-btn';
-            tercerBtn.onclick = function() {
-                mostrarEstacionamientos();
-            };
-
-            document.getElementById('vehiculosContainer').appendChild(tercerBtn);
-        }
-
-        function mostrarEstacionamientos() {
-            const parkingContainer = document.getElementById('parkingContainer');
-            parkingContainer.style.display = 'block';
-            parkingContainer.innerHTML = '';
-
-            //falta
-            const numFilas = 5;
-            const numColumnas = 5;
-
-            for (let fila = 0; fila < numFilas; fila++) {
-                for (let columna = 0; columna < numColumnas; columna++) {
-                    const parkingSpot = document.createElement('div');
-                    parkingSpot.classList.add('parking-spot', 'available');
-                    parkingSpot.textContent = `A${fila + 1}${String.fromCharCode(65 + columna)}`; 
-                    parkingContainer.appendChild(parkingSpot);
-                }
-                parkingContainer.appendChild(document.createElement('br')); 
-            }
-        }
-
-        window.onclick = function(event) {
-            const vehicleModal = document.getElementById('vehicleModal');
-            const campusModal = document.getElementById('campusModal');
-            if (event.target == vehicleModal) {
-                vehicleModal.style.display = 'none';
-            }
-            if (event.target == campusModal) {
-                campusModal.style.display = 'none';
-            }
-        }
-        
-    </script>
+    <script src="mapa_select.js"></script>
     <script src="navbar.js"></script>
-    <script src="firebase-au.js"></script>
+    <script type="modal" src="firebase-au.js"></script>
 
 </body>
 </html>

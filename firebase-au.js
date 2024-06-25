@@ -31,6 +31,11 @@ function toggleDropdown(id) {
 
 // Función para cerrar sesión (puedes definir tu lógica aquí)
 function logout() {
-    // Lógica para cerrar sesión, redirigir, etc.
-    alert('Cerrar sesión');
+    firebase.auth().signOut().then(() => {
+        // Cierre de sesión exitoso
+        window.location.href = 'index.html'; // Redirigir a la página de inicio de sesión
+    }).catch((error) => {
+        // Ocurrió un error
+        console.error('Error al cerrar sesión: ', error);
+    });
 }
