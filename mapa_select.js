@@ -1,198 +1,256 @@
-// Mostrar y cerrar modal para vehículo
-function mostrarModal() {
-    document.getElementById('vehicleModal').style.display = 'block';
-}
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js';
+import { getFirestore, doc, setDoc, getDoc, collection, addDoc, getDocs } from 'https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js';
+import { getStorage } from 'https://www.gstatic.com/firebasejs/10.9.0/firebase-storage.js';
+import { getAnalytics } from 'https://www.gstatic.com/firebasejs/10.9.0/firebase-analytics.js';
+import { getAuth } from 'https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js';
 
-function cerrarModal() {
-    document.getElementById('vehicleModal').style.display = 'none';
-}
+const firebaseConfig = {
+    apiKey: "AIzaSyDPQHtLTQCPoQSAROQHKpFcDN-xuKkYlzg",
+    authDomain: "tallerii-4104d.firebaseapp.com",
+    projectId: "tallerii-4104d",
+    storageBucket: "tallerii-4104d.appspot.com",
+    messagingSenderId: "809208530029",
+    appId: "1:809208530029:web:e823b1a85e167ec9cbab64",
+    measurementId: "G-0E1TRG4GFF"
+};
 
-// Mostrar y cerrar modal para campus
-function mostrarModalCampus() {
-    document.getElementById('campusModal').style.display = 'block';
-}
+const app = initializeApp(firebaseConfig);
 
-function cerrarModalCampus() {
-    document.getElementById('campusModal').style.display = 'none';
-}
+const db = getFirestore(app);
+const storage = getStorage(app);
+const analytics = getAnalytics(app);
+const auth = getAuth(app);
 
-// Manejo del formulario de registro de vehículo
-document.getElementById('vehicleForm').addEventListener('submit', function(event) {
-    event.preventDefault();
+console.log("Conexión a Firebase establecida correctamente.");
 
-    const marca = document.getElementById('marca').value;
-    const patente = document.getElementById('patente').value;
-    const color = document.getElementById('color').value;
+let startTime = null;
+let endTime = null;
+let disponibilidadLugares = {};
+let lugarSeleccionado = null;
 
-    if (/^[A-Z]{2,3}[0-9]{4}$/.test(patente)) {
-        alert('Vehículo registrado: ' + marca + ', ' + patente + ', ' + color);
-        agregarBotonVehiculo(marca, patente, color);
-        cerrarModal();
-        marcarComoFinalizado(document.querySelector('.add-vehicle-btn'), 'Finalizado');
-        mostrarInfoVehiculo(marca, color, patente);
-    } else {
-        alert('La patente ingresada no es válida. Debe ser en formato chileno (e.g., AB1234 o ABC123).');
-    }
+document.addEventListener('DOMContentLoaded', function() {
+    console.log("Documento cargado");
+    createLugaresSiNoExisten();
+    fetchDisponibilidadLugares();
+    document.getElementById('start-time').addEventListener('change', function(event) {
+        startTime = event.target.value;
+    });
+    document.getElementById('end-time').addEventListener('change', function(event) {
+        endTime = event.target.value;
+    });
+    document.getElementById('reservar-btn').addEventListener('click', realizarReserva);
+    document.getElementById('dialog-close-btn').addEventListener('click', closeDialog);
 });
 
-function marcarComoFinalizado(button, text) {
-    button.classList.add('completed-btn');
-    button.innerText = text;
-}
-
-function agregarBotonVehiculo(marca, patente, color) {
-    const btn = document.createElement('button');
-    btn.innerHTML = 'Seleccionar Campus';
-    btn.className = 'campus-btn';
-    btn.onclick = mostrarModalCampus;
-    document.getElementById('vehiculosContainer').appendChild(btn);
-
-    btn.dataset.marca = marca;
-    btn.dataset.patente = patente;
-    btn.dataset.color = color;
-}
-
-function mostrarInfoVehiculo(marca, patente, color) {
-    const container = document.getElementById('vehicleInfoContainer');
-    container.innerHTML = `
-        <p><strong>Marca:</strong> ${marca}</p>
-        <p><strong>Patente:</strong> ${patente}</p>
-        <p><strong>Color:</strong> ${color}</p>
-    `;
-}
-
-function mostrarUbicacionCampus() {
-    const campus = document.getElementById('campus').value;
-    const ubicacionCampusDiv = document.getElementById('ubicacionCampus');
-    ubicacionCampusDiv.innerHTML = '';
-
-    if (campus) {
-        let ubicacionTexto = '';
-        let ubicacionURL = '';
-
-        if (campus === 'Chuyaca') {
-            ubicacionTexto = 'Google Maps';
-            ubicacionURL = 'https://maps.app.goo.gl/VYjxTXeeaQF2kmRz8';
-        } else if (campus === 'Meyer') {
-            ubicacionTexto = 'Google Maps';
-            ubicacionURL = 'https://maps.app.goo.gl/VYjxTXeeaQF2kmRz8';
+async function createLugaresSiNoExisten() {
+    for (let i = 1; i <= 28; i++) {
+        const docRef = doc(db, 'lugares_meyer', i.toString());
+        const docSnapshot = await getDoc(docRef);
+        if (!docSnapshot.exists()) {
+            await setDoc(docRef, { disponible: true });
         }
-
-        const link = document.createElement('a');
-        link.textContent = ubicacionTexto;
-        link.href = ubicacionURL;
-        link.target = '_blank'; // Abre el enlace en una nueva pestaña/tab
-
-        const button = document.createElement('button');
-        button.textContent = 'Seleccionar esta ubicación';
-        button.onclick = function() {
-            alert('Ubicación seleccionada: ' + campus);
-            cerrarModalCampus();
-            document.querySelector('.campus-btn').classList.add('completed-btn');
-            document.querySelector('.campus-btn').innerText = 'Finalizado';
-            mostrarTercerBoton();
-        };
-
-        ubicacionCampusDiv.appendChild(link);
-        ubicacionCampusDiv.appendChild(button);
     }
 }
 
-function mostrarTercerBoton() {
-    const tercerBtn = document.createElement('button');
-    tercerBtn.innerHTML = 'Seleccionar Estacionamiento';
-    tercerBtn.className = 'third-btn';
-    tercerBtn.onclick = function() {
-        mostrarEstacionamientos();
-    };
-
-    document.getElementById('vehiculosContainer').appendChild(tercerBtn);
+async function fetchDisponibilidadLugares() {
+    const querySnapshot = await getDocs(collection(db, 'lugares_meyer'));
+    querySnapshot.forEach(doc => {
+        const lugarId = parseInt(doc.id);
+        const disponible = doc.data().disponible;
+        disponibilidadLugares[lugarId] = disponible;
+        console.log(`Lugar ${lugarId}: ${disponible ? 'Disponible' : 'Ocupado'}`);
+    });
+    buildMapaLugares();
 }
 
-function mostrarEstacionamientos() {
-    const parkingContainer = document.getElementById('parkingContainer');
-    parkingContainer.style.display = 'block';
-    parkingContainer.innerHTML = '';
+function buildMapaLugares() {
+    const container = document.getElementById('mapa-lugares-container');
+    container.innerHTML = '';
 
-    const numFilas = 5;
-    const numColumnas = 5;
+    // Fila con lugar preferencial
+    container.appendChild(createFilaLugaresConPreferencial(6, 3));
+  
+    // Fila superior
+    container.appendChild(createFilaLugares(0, 6));
 
-    for (let fila = 0; fila < numFilas; fila++) {
-        for (let columna = 0; columna < numColumnas; columna++) {
-            const parkingSpot = document.createElement('button'); // Cambiado de 'div' a 'button'
-            parkingSpot.classList.add('parking-spot');
-            parkingSpot.textContent = `A${fila + 1}${String.fromCharCode(65 + columna)}`;
+  
+    // Entrada
+    container.appendChild(document.createTextNode(' Entrada '));
+  
+    // Fila inferior
+    container.appendChild(createFilaLugares(8, 6));
+  
+    // Fila con 7 lugares
+    container.appendChild(createFilaLugares(14, 7));
+  
+    // Fila con 7 lugares
+    container.appendChild(createFilaLugares(21, 7));
+}
 
-            // Asignar clase disponible u ocupada de forma aleatoria
-            const ocupado = Math.random() < 0.5; // Cambiar la probabilidad si es necesario
-            if (ocupado) {
-                parkingSpot.classList.add('occupied');
-                parkingSpot.disabled = true;
-            } else {
-                parkingSpot.classList.add('available');
-                parkingSpot.onclick = function() {
-                    seleccionarEstacionamiento(parkingSpot);
-                };
-            }
-            parkingContainer.appendChild(parkingSpot);
+function createFilaLugares(startIndex, count) {
+    const row = document.createElement('div');
+    row.className = 'lugares-row';
+    for (let i = startIndex; i < startIndex + count; i++) {
+      row.appendChild(createLugar(i));
+    }
+    return row;
+}
+
+function createFilaLugaresConPreferencial(startIndex, count) {
+    const row = document.createElement('div');
+    row.className = 'lugares-row';
+    for (let i = startIndex; i < startIndex + count; i++) {
+      row.appendChild(createLugarPreferencial(i));
+    }
+    return row;
+}
+
+function createLugar(index) {
+    const lugar = document.createElement('div');
+    lugar.className = 'lugar';
+    lugar.style.backgroundColor = getLugarColor(index);
+    lugar.innerText = (index + 1).toString();
+
+    lugar.addEventListener('click', () => {
+        if (disponibilidadLugares[index] === false) {
+            showDialog('Estacionamiento no disponible', 'Este estacionamiento no está disponible.');
+        } else {
+            toggleSeleccion(index);
         }
-        parkingContainer.appendChild(document.createElement('br'));
-    }
-}
-let selectedSpot = null;
-function seleccionarEstacionamiento(parkingSpot) {
-    const parkingContainer = document.getElementById('parkingContainer');
-    const botones = parkingContainer.getElementsByClassName('parking-spot');
-    
-    for (let boton of botones) {
-        boton.classList.remove('selected');
-    }
+    });
 
-    parkingSpot.classList.add('selected');
-
-    // Mostrar botón de horarios disponibles
-    mostrarBotonHorariosDisponibles();
+    return lugar;
 }
 
-function mostrarBotonHorariosDisponibles() {
-    const horariosBtn = document.createElement('button');
-    horariosBtn.innerHTML = 'Horarios Disponibles';
-    horariosBtn.className = 'horarios-btn';
-    horariosBtn.onclick = function() {
-        mostrarModalHorariosDisponibles();
-    };
+function createLugarPreferencial(index) {
+    const lugar = document.createElement('div');
+    lugar.className = 'lugar';
+    lugar.style.backgroundColor = getLugarColorPreferencia(index);
+    lugar.innerHTML = '<i class="material-icons">accessible</i>';
 
-    // Eliminar botón de horarios disponibles si ya existe
-    const vehiculosContainer = document.getElementById('vehiculosContainer');
-    const existingHorariosBtn = vehiculosContainer.querySelector('.horarios-btn');
-    if (existingHorariosBtn) {
-        vehiculosContainer.removeChild(existingHorariosBtn);
-    }
+    lugar.addEventListener('click', () => {
+        if (disponibilidadLugares[index] === false) {
+            showDialog('Estacionamiento no disponible', 'Este estacionamiento no está disponible.');
+        } else {
+            toggleSeleccion(index);
+        }
+    });
 
-    vehiculosContainer.appendChild(horariosBtn);
+    return lugar;
 }
 
-function mostrarModalHorariosDisponibles() {
-    const horariosModal = document.getElementById('horariosModal');
-    horariosModal.style.display = 'block';
+function getLugarColor(index) {
+    if (lugarSeleccionado === index) {
+        return 'green';
+    } else if (disponibilidadLugares[index] === false) {
+        return 'red';
+    } else {
+        return 'grey';
+    }
 }
 
-function cerrarModalHorariosDisponibles() {
-    const horariosModal = document.getElementById('horariosModal');
-    horariosModal.style.display = 'none';
+function getLugarColorPreferencia(index) {
+    if (lugarSeleccionado === index) {
+        return 'green';
+    } else if (disponibilidadLugares[index] === false) {
+        return 'red';
+    } else {
+        return 'blue';
+    }
 }
 
-window.onclick = function(event) {
-    const vehicleModal = document.getElementById('vehicleModal');
-    const campusModal = document.getElementById('campusModal');
-    const horariosModal = document.getElementById('horariosModal');
-    if (event.target == vehicleModal) {
-        vehicleModal.style.display = 'none';
-    }
-    if (event.target == campusModal) {
-        campusModal.style.display = 'none';
-    }
-    if (event.target == horariosModal) {
-        horariosModal.style.display = 'none';
-    }
+function toggleSeleccion(index) {
+    lugarSeleccionado = (lugarSeleccionado === index) ? null : index;
+    buildMapaLugares();
+}
+
+async function realizarReserva() {
+  if (!startTime || !endTime) {
+      showDialog('Error en la reserva', 'Por favor, seleccione ambas horas de inicio y fin.');
+      return;
+  }
+
+  if (lugarSeleccionado === null) {
+      showDialog('Error en la reserva', 'Por favor, seleccione un lugar.');
+      return;
+  }
+
+  if (disponibilidadLugares[lugarSeleccionado] === false) {
+      showDialog('Estacionamiento no disponible', 'Este estacionamiento no está disponible.');
+      return;
+  }
+
+  try {
+      const user = auth.currentUser;
+      if (user) {
+          const userDocRef = doc(db, 'users', user.uid);
+          const userDoc = await getDoc(userDocRef);
+          
+          let userName = 'Nombre no encontrado';
+          if (userDoc.exists()) {
+              const userData = userDoc.data();
+              if (userData && userData.nombre) {
+                  userName = userData.nombre;
+              } else {
+                  console.error('El documento de usuario no contiene el campo "nombre".');
+              }
+          } else {
+              console.error('El documento de usuario no existe.');
+          }
+          // Obtener la última patente añadida por el usuario
+          async function obtenerUltimaPatente(userUid) {
+              const vehiculosQuery = collection(db, 'vehiculos');
+              const vehiculosSnapshot = await getDocs(vehiculosQuery);
+          
+              let ultimaPatente = 'Patente no encontrada';
+          
+              vehiculosSnapshot.forEach(doc => {
+                  const vehiculoData = doc.data();
+                  if (vehiculoData.userId === userUid) {
+                      ultimaPatente = vehiculoData.patente;
+                  }
+              });
+          
+              return ultimaPatente;
+          }
+          const ultimaPatente = await obtenerUltimaPatente(user.uid);
+          console.log('Última patente encontrada:', ultimaPatente);
+          await addDoc(collection(db, 'reservas'), {
+              lugar: lugarSeleccionado.toString(),
+              hora_inicio: startTime,
+              hora_fin: endTime,
+              patente: ultimaPatente,
+              timestamp: new Date(),
+              uid: user.uid,
+              usuario: userName,
+              activa: false
+          });
+
+        const lugarDocRef = doc(db, 'lugares_meyer', lugarSeleccionado.toString());
+        await setDoc(lugarDocRef, { disponible: false });
+
+          const message = `Estimado ${userName}, su reserva fue realizada con éxito en el estacionamiento ${lugarSeleccionado} desde ${startTime} hasta ${endTime}.`;
+          showDialog('Reserva Exitosa', `${message}`);
+          setTimeout(() => {
+            // Redirigir a la página de reserva exitosa
+            window.location.href = `reserva_exitosa.html?nombre=${encodeURIComponent(userName)}&lugar=${lugarSeleccionado}&hora_inicio=${startTime}&hora_fin=${endTime}`;
+        }, 3000);
+          fetchDisponibilidadLugares(); // Actualizar disponibilidad después de reservar
+      } else {
+          showDialog('Error en la reserva', 'Usuario no autenticado.');
+      }
+  } catch (error) {
+      console.error("Error al realizar la reserva:", error);
+      showDialog('Error en la reserva', 'No se pudo realizar la reserva. Inténtelo nuevamente.');
+  }
+}
+
+function showDialog(title, message) {
+    document.getElementById('dialog-title').innerText = title;
+    document.getElementById('dialog-message').innerText = message;
+    document.getElementById('dialog-overlay').style.display = 'flex';
+}
+
+function closeDialog() {
+    document.getElementById('dialog-overlay').style.display = 'none';
 }

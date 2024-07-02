@@ -6,6 +6,9 @@
     <title>Estacionamientos ULagos</title>
     <link rel="stylesheet" href="styles.css">
     <script type="module" src="firebase-config.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-firestore-compat.js"></script>
     <style>
     
         body {
@@ -143,77 +146,92 @@
         <button onclick="location.href='historial.html'" id="history-btn" style="display: none;">Historial</button>
         <button onclick="logout()" id="logout-btn" style="display: none;">Cerrar Sesión</button>
     </div>
-    <div class="content">
-        <h1 style="color: blue;">Estacionamientos Chuyaca - Meyer</h1>
-        <div class="formulario-container">
-            <form id="reservaForm" onsubmit="registrar(event)">
-                <label for="nombre">Nombre y Apellido:</label>
-                <input type="text" id="nombre" name="nombre" pattern="[A-Za-zÁÉÍÓÚáéíóúÜüÑñ\s]+ [A-Za-zÁÉÍÓÚáéíóúÜüÑñ\s]+" title="Ingrese un nombre y apellido válido (ej. Diego Gallegos)" required>
+    <body>
+        <!-- Navbar y contenido -->
+        <div class="content">
+            <h1 style="color: blue;">Estacionamientos Chuyaca - Meyer</h1>
+            <div class="formulario-container">
+                <form id="reservaForm">
+                    <label for="nombre">Nombre y Apellido:</label>
+                    <input type="text" id="nombre" name="nombre" pattern="[A-Za-zÁÉÍÓÚáéíóúÜüÑñ\s]+ [A-Za-zÁÉÍÓÚáéíóúÜüÑñ\s]+" title="Ingrese un nombre y apellido válido (ej. Diego Gallegos)" required>
     
-                <label for="telefono">Teléfono (9XXXXXXXX):</label>
-                <input type="tel" id="telefono" name="telefono" pattern="9[0-9]{8}" title="Ingrese un número de teléfono válido (ej. 912345678)" required>
-                
-                <label for="correo">Correo Electrónico (solo @ulagos.cl o @alumnos.ulagos.cl):</label>
-                <input type="email" id="correo" name="correo" required>
+                    <label for="telefono">Teléfono (9XXXXXXXX):</label>
+                    <input type="tel" id="telefono" name="telefono" pattern="9[0-9]{8}" title="Ingrese un número de teléfono válido (ej. 912345678)" required>
+                    
+                    <label for="correo">Correo Electrónico (solo @ulagos.cl o @alumnos.ulagos.cl):</label>
+                    <input type="email" id="correo" name="correo" required>
     
-                <label for="contrasena">Contraseña (Mayúscula, minúscula, números y signo):</label>
-                <input type="password" id="contrasena" name="contrasena" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*\W).{8,}$" required>
+                    <label for="contrasena">Contraseña (Mayúscula, minúscula, números y signo):</label>
+                    <input type="password" id="contrasena" name="contrasena" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*\W).{8,}$" required>
     
-                <label for="confirmarContrasena">Confirmar Contraseña:</label>
-                <input type="password" id="confirmarContrasena" name="confirmarContrasena" required oninput="validarConfirmacionContrasena()">
+                    <label for="confirmarContrasena">Confirmar Contraseña:</label>
+                    <input type="password" id="confirmarContrasena" name="confirmarContrasena" required oninput="validarConfirmacionContrasena()">
     
-                <button type="button" onclick="validarAntesDeRegistrar()">Registrar</button>
-            </form>
-            <div id="mensajeReserva"></div>
+                    <button type="button" onclick="registrarUsuario()">Registrar</button>
+                </form>
+                <div id="mensajeReserva"></div>
+            </div>
         </div>
-    </div>
-    <script>
-        function validarContrasena() {
-            const inputContrasena = document.getElementById('contrasena');
-            const contrasena = inputContrasena.value;
-            const contrasenaPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*\W).{8,}$/;
+    
+        <script src="navbar.js"></script>
+        <script>
+            // Inicialización de Firebase
+            const firebaseConfig = {
+                apiKey: "AIzaSyDPQHtLTQCPoQSAROQHKpFcDN-xuKkYlzg",
+                authDomain: "tallerii-4104d.firebaseapp.com",
+                projectId: "tallerii-4104d",
+                storageBucket: "tallerii-4104d.appspot.com",
+                messagingSenderId: "809208530029",
+                appId: "1:809208530029:web:e823b1a85e167ec9cbab64",
+                measurementId: "G-0E1TRG4GFF"
+            };
+            firebase.initializeApp(firebaseConfig);
+            const auth = firebase.auth();
+            const db = firebase.firestore();
 
-            if (!contrasenaPattern.test(contrasena)) {
-                inputContrasena.setCustomValidity('La contraseña debe incluir al menos una mayúscula, una minúscula, un número y un carácter especial');
-            } else {
-                inputContrasena.setCustomValidity('');
+            db.enablePersistence()
+                .then(() => {
+                    console.log("Firestore habilitado localmente.");
+                })
+                .catch((error) => {
+                    console.error("Error al habilitar Firestore localmente:", error);
+                });
+    
+            // Función para registrar un usuario
+            function registrarUsuario() {
+                const nombre = document.getElementById('nombre').value;
+                const correo = document.getElementById('correo').value;
+                const contrasena = document.getElementById('contrasena').value;
+                const confirmarContrasena = document.getElementById('confirmarContrasena').value;
+    
+                if (contrasena !== confirmarContrasena) {
+                    document.getElementById('mensajeReserva').textContent = "Las contraseñas no coinciden.";
+                    return;
+                }
+    
+                auth.createUserWithEmailAndPassword(correo, contrasena)
+                    .then((userCredential) => {
+                        const user = userCredential.user;
+                        console.log("Usuario registrado:", user.uid);
+    
+                        return db.collection('users').doc(user.uid).set({
+                            nombre: nombre,
+                            correo: correo,
+                            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                    })
+                    .then(() => {
+                        console.log("Datos adicionales guardados en Firestore.");
+                        document.getElementById("mensajeReserva").textContent = "Usuario registrado con éxito.";
+                        setTimeout(() => {
+                            window.location.href = 'login.html';
+                        }, 3000); // Redirigir después de 3 segundos
+                    })
+                    .catch((error) => {
+                        console.error("Error al registrar usuario:", error.message);
+                        document.getElementById("mensajeReserva").textContent = `Error: ${error.message}`;
+                    });
             }
-        }
-
-        function validarConfirmacionContrasena() {
-            const contrasena = document.getElementById('contrasena').value;
-            const confirmarContrasena = document.getElementById('confirmarContrasena').value;
-
-            if (contrasena !== confirmarContrasena) {
-                document.getElementById('confirmarContrasena').setCustomValidity('Las contraseñas no coinciden');
-            } else {
-                document.getElementById('confirmarContrasena').setCustomValidity('');
-            }
-        }
-
-        function validarNombre() {
-            const inputNombre = document.getElementById('nombre');
-            const nombre = inputNombre.value;
-            const nombrePattern = /^[A-Za-zÁÉÍÓÚáéíóúÜüÑñ\s]+ [A-Za-zÁÉÍÓÚáéíóúÜüÑñ\s]+$/;
-
-            if (!nombrePattern.test(nombre)) {
-                inputNombre.setCustomValidity('Por favor, ingrese un nombre y apellido válido (ej. Diego Gallegos)');
-            } else {
-                inputNombre.setCustomValidity('');
-            }
-        }
-
-        function validarAntesDeRegistrar() {
-            validarNombre();
-            validarContrasena();
-            validarConfirmacionContrasena();
-            if (document.getElementById('nombre').checkValidity() && document.getElementById('contrasena').checkValidity() && document.getElementById('confirmarContrasena').checkValidity()) {
-                // Ejecutar la función de registrar definida globalmente
-                registrar(event);
-            }
-        }
-    </script>
-    <script src="navbar.js"></script>
-    <script type="module" src="firebase-config.js"></script>
-</body>
-</html>
+        </script>
+    </body>
+    </html>

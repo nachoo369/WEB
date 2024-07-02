@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historial de Reservas</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="estacionamiento.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script type="module" src="historial.js"></script>
+    <script type="modal" src="firebase-au.js"></script>
+
+
+
+    <style>
+        .dropdown {
+            position: relative;
+            display: inline-block;
+            margin-left: 20px; /* Ajusta según tu diseño */
+            /* Alineación hacia la izquierda */
+            text-align: left;
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(82, 80, 80, 0);
+            z-index: 1;
+            padding: 5px 0;
+            border-radius: 5px;
+            right: 0; /* Ajusta para que el menú aparezca al lado */
+            top: 100%; /* Ajusta la posición vertical según tu diseño */
+        }
+        .dropdown-content a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            cursor: pointer;
+        }
+
+        .dropdown-content a:hover {background-color: #f1f1f1}
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .dropdown:hover .dropbtn {
+            background-color: #ffffff13;
+        }
+
+        .content {
+            text-align: center;
+            padding: 50px;}
+        .reservas-table {
+            width: 80%;
+            margin: 20px auto;
+            border-collapse: collapse;
+        }
+        .reservas-table th, .reservas-table td {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+        .reservas-table th {
+            background-color: #f2f2f2;
+        }
+    </style>
+    <script src="firebase-au.js"></script>
+
+</head>
+<body>
+    <div class="navbar">
+        <img src="logo_ula.png" alt="Logo" onclick="location.href='index.html'">
+        <div class="nav-buttons">
+            <button id="user-name" style="display: none;"></button>
+            <!-- Menú desplegable para el correo -->
+            <div class="dropdown">
+                <button class="dropbtn" onclick="toggleDropdown('email-options')">☰</button>
+                <div id="email-options" class="dropdown-content">
+                    <a href="#">Historial de Reservas</a>
+                    <a href="estacionamiento.html">Reservar Estacionamiento</a>
+                    <a href="index.html" onclick="logout()">Cerrar Sesión</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <main>
+        <h1>Historial de Reservas</h1>
+        <table class="reservas-table">
+            <thead>
+                <tr>
+                    <th>ID de Reserva</th>
+                    <th>Nombre de Usuario</th>
+                    <th>Fecha</th>
+                    <th>Hora de Inicio</th>
+                    <th>Hora de Fin</th>
+                    <th>Lugar</th>
+                    <th>Patente</th>
+                    <th>Activa</th>
+                    <!-- Agrega más columnas según sea necesario -->
+                </tr>
+            </thead>
+            <tbody id="reservas-body">
+                <!-- Aquí se llenará dinámicamente con JavaScript -->
+            </tbody>
+        </table>
+    </main>
+</body>
+</html>

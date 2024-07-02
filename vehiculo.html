@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reserva de Estacionamiento</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="estacionamiento.css">
+    <link rel="stylesheet" href="styles.css">
+
+    <!-- Incluir Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-firestore-compat.js"></script>
+    <script defer src="vehiculo.js"></script>
+
+    <!-- Incluir el archivo JS del vehículo -->
+    <script src="vehiculo.js" defer></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: white;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+        .dropdown {
+            position: relative;
+            display: inline-block;
+            margin-left: 20px; /* Ajusta según tu diseño */
+            /* Alineación hacia la izquierda */
+            text-align: left;
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(82, 80, 80, 0);
+            z-index: 1;
+            padding: 5px 0;
+            border-radius: 5px;
+            right: 0; /* Ajusta para que el menú aparezca al lado */
+            top: 100%; /* Ajusta la posición vertical según tu diseño */
+        }
+        .dropdown-content a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            cursor: pointer;
+        }
+
+        .dropdown-content a:hover {background-color: #f1f1f1}
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .dropdown:hover .dropbtn {
+            background-color: #ffffff13;
+        }
+
+        .content {
+            text-align: center;
+            padding: 50px;
+        }
+
+        form {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        form div {
+            margin-bottom: 10px;
+        }
+
+        form label {
+            display: inline-block;
+            width: 150px;
+            text-align: right;
+            margin-right: 15px;
+            font-weight: bold;
+        }
+
+        form input[type="text"],
+        form input[type="time"] {
+            width: 300px;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        form button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        form button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <img src="logo_ula.png" alt="Logo" onclick="location.href='index.html'">
+        <div class="nav-buttons">
+            <button id="user-name" style="display: none;"></button>
+            <!-- Menú desplegable para el correo -->
+            <div class="dropdown">
+                <button class="dropbtn" onclick="toggleDropdown('email-options')">☰</button>
+                <div id="email-options" class="dropdown-content">
+                    <a href="#">Historial de Reservas</a>
+                    <a href="estacionamiento.html">Reservar Estacionamiento</a>
+                    <a href="index.html" onclick="logout()">Cerrar Sesión</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <main>
+        <h1>1. Primer paso es agregar un vehículo</h1>
+        <form id="vehiculo-form" onsubmit="submitForm(event)">
+            <div>
+                <label for="color">Color:</label>
+                <input type="text" id="color" name="color" value="Gris" required>
+            </div>
+            <div>
+                <label for="modelo">Modelo:</label>
+                <input type="text" id="modelo" name="modelo" value="Cherry" required>
+            </div>
+            <div>
+                <label for="patente">Patente:</label>
+                <input type="text" id="patente" name="patente" value="JK LZ 45" required>
+            </div>
+            <button type="submit">Continuar</button>
+        </form>
+    </main>
+
+    <div id="dialog-overlay" class="dialog-overlay">
+        <div class="dialog">
+            <h2 id="dialog-title"></h2>
+            <p id="dialog-message"></p>
+            <button id="dialog-close-btn">Cerrar</button>
+        </div>
+    </div>
+    <script>
+
+        if (!firebase.apps.length) {
+            const firebaseConfig = {
+                apiKey: "AIzaSyDPQHtLTQCPoQSAROQHKpFcDN-xuKkYlzg",
+                authDomain: "tallerii-4104d.firebaseapp.com",
+                projectId: "tallerii-4104d",
+                storageBucket: "tallerii-4104d.appspot.com",
+                messagingSenderId: "809208530029",
+                appId: "1:809208530029:web:e823b1a85e167ec9cbab64",
+                measurementId: "G-0E1TRG4GFF"
+            };
+            firebase.initializeApp(firebaseConfig);
+        }
+
+
+    </script>
+</body>
+</html>

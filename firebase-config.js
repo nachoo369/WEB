@@ -1,9 +1,8 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword, sendEmailVerification} from "https://www.gstatic.com/firebasejs/10.12.1/firebase-auth.js";
-import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-analytics.js";
+import { getAuth, createUserWithEmailAndPassword, sendEmailVerification } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-auth.js";
 import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-firestore.js";
 
-// Tu configuración de Firebase
+// Configuración de Firebase
 const firebaseConfig = {
     apiKey: "AIzaSyDPQHtLTQCPoQSAROQHKpFcDN-xuKkYlzg",
     authDomain: "tallerii-4104d.firebaseapp.com",
@@ -16,23 +15,21 @@ const firebaseConfig = {
 
 // Inicializar Firebase
 const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
 const auth = getAuth(app);
-const db = getFirestore(app); // Inicializar Firestore
+const db = getFirestore(app);
 
 // Hacer Firebase accesible globalmente
 window.firebaseAuth = auth;
+window.firebaseDb = db;
 
 // Función para registrar al usuario
-window.registrar = function(event) {
-    event.preventDefault();
+window.registrar = function() {
+    const nombre = document.getElementById('nombre').value;
+    const telefono = document.getElementById('telefono').value;
+    const correo = document.getElementById('correo').value;
+    const contrasena = document.getElementById('contrasena').value;
 
-    var nombre = document.getElementById("nombre").value;
-    var telefono = document.getElementById("telefono").value;
-    var correo = document.getElementById("correo").value;
-    var contrasena = document.getElementById("contrasena").value;
-
-    var auth = window.firebaseAuth;
+    const auth = window.firebaseAuth;
     if (!auth) {
         console.error("Firebase Auth no está inicializado correctamente.");
         return;
@@ -40,41 +37,52 @@ window.registrar = function(event) {
 
     createUserWithEmailAndPassword(auth, correo, contrasena)
         .then((userCredential) => {
-            var user = userCredential.user;
-            const auth = getAuth();
+            const user = userCredential.user;
             console.log("Usuario registrado:", user);
 
             // Envía el correo de verificación después de registrar al usuario
             sendEmailVerification(auth.currentUser)
                 .then(() => {
-                    console.log("correo enviado")
-                }).catch((error) => {
-                    console.log("no funca")
+                    console.log("Correo de verificación enviado");
+                    document.getElementById("mensajeReserva").textContent = "Usuario registrado con éxito. Verifica tu correo electrónico.";
+
+                    // Guardar información adicional en Firestore
+                    return addDoc(collection(db, 'users'), {
+                        userId: user.uid,
+                        name: nombre,
+                        telefono: telefono,
+                        correo: correo,
+                        createdAt: new Date().toISOString()
+                    });
                 })
-        })
-        .then(() => {
-            console.log("Correo de verificación enviado correctamente");
-            document.getElementById("mensajeReserva").textContent = "Usuario registrado con éxito. Verifica tu correo electrónico.";
-            setTimeout(() => {
-                window.location.href = 'login.html';
-            }, 3000); // Redirige a la página de login después de 3 segundos
+                .then(() => {
+                    console.log("Información adicional guardada en Firestore");
+                    // Redirige a la página de login después de 3 segundos
+                    setTimeout(() => {
+                        window.location.href = 'login.html';
+                    }, 3000);
+                })
+                .catch((error) => {
+                    console.error("Error al enviar correo de verificación:", error);
+                    document.getElementById("mensajeReserva").textContent = "Error al enviar correo de verificación: " + error.message;
+                });
         })
         .catch((error) => {
-            var errorCode = error.code;
-            var errorMessage = error.message;
+            const errorCode = error.code;
+            const errorMessage = error.message;
             console.error("Error al registrar el usuario:", errorCode, errorMessage);
-            document.getElementById("mensajeReserva").textContent = `Error: ${errorMessage}`;
+            document.getElementById("mensajeReserva").textContent = "Error al registrar el usuario: " + errorMessage;
         });
+};
+
+// Función para validar la confirmación de contraseña
+function validarConfirmacionContrasena() {
+    const contrasena = document.getElementById('contrasena').value;
+    const confirmarContrasena = document.getElementById('confirmarContrasena').value;
+
+    if (contrasena !== confirmarContrasena) {
+        document.getElementById('confirmarContrasena').setCustomValidity('Las contraseñas no coinciden');
+    } else {
+        document.getElementById('confirmarContrasena').setCustomValidity('');
+    }
 }
-
-
-//function verificarCorreo(){
-    //var user = firebase.auth().currentUser;
-    //user.sendEmailVerification().then(function(){
-   //     console.log("correo enviado")
-
-   // }).catch(function(error){
-   //     console.log("no se envio")
-   // });
-//}
-

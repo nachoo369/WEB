@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reserva Exitosa</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="estacionamiento.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="firebase-au.js"></script>
+    <style>
+        .receipt {
+            background-color: #f9f9f9;
+            border-radius: 15px;
+            padding: 20px;
+            max-width: 900px;
+            margin: 20px auto;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .receipt-info p {
+            margin: 10px 0;
+        }
+        .receipt-info strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .actions {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+        .actions a {
+            color: #007BFF;
+            text-decoration: none;
+            padding: 10px 20px; /* Añadido padding para mayor separación */
+            border: 1px solid #007BFF; /* Añadido borde para mayor visibilidad */
+            border-radius: 5px; /* Añadido border-radius para bordes curvos */
+        }
+        .dropdown {
+            position: relative;
+            display: inline-block;
+            margin-left: 20px; /* Ajusta según tu diseño */
+            /* Alineación hacia la izquierda */
+            text-align: left;
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(82, 80, 80, 0);
+            z-index: 1;
+            padding: 5px 0;
+            border-radius: 5px;
+            right: 0; /* Ajusta para que el menú aparezca al lado */
+            top: 100%; /* Ajusta la posición vertical según tu diseño */
+        }
+        .dropdown-content a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            cursor: pointer;
+        }
+
+        .dropdown-content a:hover {background-color: #f1f1f1}
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .dropdown:hover .dropbtn {
+            background-color: #ffffff13;
+        }
+
+        .content {
+            text-align: center;
+            padding: 50px;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <img src="logo_ula.png" alt="Logo" onclick="location.href='index.html'">
+        <div class="nav-buttons">
+            <button id="user-name" style="display: none;"></button>
+            <!-- Menú desplegable para el correo -->
+            <div class="dropdown">
+                <button class="dropbtn" onclick="toggleDropdown('email-options')">☰</button>
+                <div id="email-options" class="dropdown-content">
+                    <a href="#">Historial de Reservas</a>
+                    <a href="estacionamiento.html">Reservar Estacionamiento</a>
+                    <a href="index.html" onclick="logout()">Cerrar Sesión</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <main class="receipt">
+        <h1>Reserva Exitosa</h1>
+        <div class="receipt-info">
+            <p><strong>Nombre:</strong> <span id="nombre-usuario"></span></p>
+            <p><strong>Fecha:</strong> <span id="fecha-actual"></span></p>
+            <p><strong>Hora de Inicio:</strong> <span id="hora-inicio"></span></p>
+            <p><strong>Hora de Fin:</strong> <span id="hora-fin"></span></p>
+        </div>
+        <div class="actions">
+            <a href="historial_reservas.html">Ver Historial de Reservas</a>
+            <a href="informar_problema.html">Enviar Comentario</a>
+        </div>
+    </main>
+
+    <script>
+        // Obtener parámetros de la URL
+        const params = new URLSearchParams(window.location.search);
+        const nombre = params.get('nombre');
+        const horaInicio = params.get('hora_inicio');
+        const horaFin = params.get('hora_fin');
+
+        // Mostrar los datos en el recibo
+        document.getElementById('nombre-usuario').innerText = nombre;
+        document.getElementById('hora-inicio').innerText = horaInicio;
+        document.getElementById('hora-fin').innerText = horaFin;
+
+        // Obtener y mostrar la fecha actual
+        const fechaActual = new Date().toLocaleDateString('es-ES', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+        });
+        document.getElementById('fecha-actual').innerText = fechaActual;
+    </script>
+</body>
+</html>
