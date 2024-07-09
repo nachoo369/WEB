@@ -129,8 +129,8 @@
         // Hacer Firebase accesible globalmente
         window.firebaseAuth = auth;
 
-        // Función para iniciar sesión
-        window.login = function(event) {
+        // Función para iniciar sesión de administrador
+        window.loginAdmin = function(event) {
             event.preventDefault();
 
             var correo = document.getElementById("correo").value;
@@ -145,17 +145,17 @@
             signInWithEmailAndPassword(auth, correo, contrasena)
                 .then((userCredential) => {
                     var user = userCredential.user;
-                    console.log("Usuario iniciado:", user);
+                    console.log("Usuario administrador iniciado:", user);
                     sessionStorage.setItem('username', user.email); // Suponiendo que el nombre de usuario es el email
                     document.getElementById("mensajeLogin").textContent = "Inicio de sesión exitoso.";
 
-                    // Redirigir a la página de selección de estacionamiento
-                    window.location.href = 'vehiculo.html';
+                    // Redirigir a la página de administración
+                    window.location.href = 'admin_dashboard.html';
 
                 })
                 .catch((error) => {
                     console.error("Error al iniciar sesión:", error);
-                    alert("Credenciales incorrectas");
+                    document.getElementById("mensajeLogin").textContent = "Error al iniciar sesión. Verifique sus credenciales.";
                 });
         }
     </script>
@@ -177,9 +177,9 @@
         <button onclick="logout()" id="logout-btn" style="display: none;">Cerrar Sesión</button>
     </div>
     <div class="content">
-        <h1 style="color: blue;">Iniciar Sesión</h1>
+        <h1 style="color: blue;">Iniciar Sesión - Administrador</h1>
         <div class="formulario-container">
-            <form id="loginForm" onsubmit="login(event)">
+            <form id="loginForm" onsubmit="loginAdmin(event)">
                 <label for="correo">Correo Electrónico:</label>
                 <input type="email" id="correo" name="correo" required>
                 

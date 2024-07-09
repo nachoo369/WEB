@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Usuarios Registrados</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: white;
+            margin: 0;
+            padding: 0;
+        }
+
+        .content {
+            padding: 50px;
+            text-align: center;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table, th, td {
+            border: 1px solid black;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+        }
+
+        th {
+            background-color: blue;
+            color: white;
+        }
+
+        tr:hover {
+            background-color: #f5f5f5;
+            cursor: pointer;
+        }
+
+        .options {
+            margin-top: 20px;
+        }
+
+        .options button {
+            background-color: blue;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .options button:hover {
+            background-color: darkblue;
+        }
+
+        .error-message {
+            color: red;
+            margin-top: 20px;
+        }
+        #editForm {
+            display: none;
+            position: absolute; /* Cambia a posición absoluta */
+            top: 50%; /* Ajusta la posición verticalmente */
+            left: 50%; /* Ajusta la posición horizontalmente */
+            transform: translate(-50%, -50%); /* Centra el formulario */
+            background-color: white; /* Fondo blanco */
+            padding: 20px; /* Espaciado interior */
+            border: 1px solid blue; /* Borde */
+            border-radius: 5px; /* Bordes redondeados */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Sombra ligera */
+        }
+        #menu {
+            display: none; /* Oculta el menú por defecto */
+            position: absolute;
+            top: 60px; /* Ajusta la posición según tu navbar */
+            right: 20px; /* Ajusta la posición según tu diseño */
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+            padding: 10px;
+        }
+
+        .menu-item {
+            background-color: rgba(140, 108, 247, 0.275);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px;
+            width: 200px;
+            text-align: center;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s;
+        }
+        .menu {
+            display: flex;
+            justify-content: center; /* Centra horizontalmente los elementos internos */
+            flex-wrap: wrap;
+        }
+
+        .menu-item:hover {
+            background-color: rgba(140, 108, 247, 0.5);
+        }
+
+        .menu-item a {
+            text-decoration: none;
+            color: blue;
+            font-size: 18px;
+            display: block;
+        }
+
+        .menu-item a:hover {
+            text-decoration: underline;
+        }
+        .search-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .search-container input[type=text] {
+            padding: 10px;
+            margin: 5px;
+            width: 300px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <img src="logo_ula.png" alt="Logo" onclick="location.href='admin_dashboard.html'">
+        <div class="nav-buttons">
+            <button onclick="location.href='admin_dashboard.html'">Dashboard</button>
+            <button onclick="logout()">Cerrar Sesión</button>
+        </div>
+        <div class="menu-icon" onclick="toggleMenu()">☰</div>
+    </div>
+    <div class="content">
+        <h1>Usuarios Registrados</h1>
+        <button onclick="agregarUsuario()">Agregar Usuario +</button> <!-- Botón para agregar usuario -->
+        <div class="search-container">
+            <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="Buscar por nombre...">
+        </div>
+        <table id="usuariosTable">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Correo</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="usuariosBody">
+                <!-- Las filas se llenarán dinámicamente desde Firestore -->
+            </tbody>
+        </table>
+        <div class="options" id="options" style="display:none;">
+            <button onclick="editUsuario()">Editar</button>
+            <button onclick="deleteUsuario()">Borrar</button>
+        </div>
+        <div class="error-message" id="error-message"></div>
+        <div id="editForm" style="display:none;">
+            <input type="text" id="newNombre" placeholder="Nuevo Nombre">
+            <input type="email" id="newCorreo" placeholder="Nuevo Correo">
+            <button onclick="confirmEdit()">Guardar</button>
+            <button onclick="cancelEdit()">Cancelar</button>
+        </div>
+    </div>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-app.js";
+        import { getFirestore, collection, getDocs, doc, updateDoc, deleteDoc, addDoc} from "https://www.gstatic.com/firebasejs/10.12.1/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-auth.js";
+
+        // Tu configuración de Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyDPQHtLTQCPoQSAROQHKpFcDN-xuKkYlzg",
+            authDomain: "tallerii-4104d.firebaseapp.com",
+            projectId: "tallerii-4104d",
+            storageBucket: "tallerii-4104d.appspot.com",
+            messagingSenderId: "809208530029",
+            appId: "1:809208530029:web:e823b1a85e167ec9cbab64",
+            measurementId: "G-0E1TRG4GFF"
+        };
+
+        // Inicializar Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        let selectedUsuarioId = null;
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // Usuario autenticado
+                loadUsuarios();
+            } else {
+                // No hay usuario autenticado
+                document.getElementById("error-message").innerText = "Error: No hay usuario autenticado.";
+            }
+        });
+
+        async function loadUsuarios() {
+            try {
+                const querySnapshot = await getDocs(collection(db, "users"));
+                const usuariosBody = document.getElementById("usuariosBody");
+                usuariosBody.innerHTML = "";
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    const row = document.createElement("tr");
+                    row.onclick = () => selectUsuario(doc.id);
+                    row.innerHTML = `
+                        <td>${doc.id}</td>
+                        <td>${data.nombre || data.name || 'Nombre Desconocido'}</td>
+                        <td>${data.correo || data.email || 'Correo Desconocido'}</td>
+                        <td><button onclick="event.stopPropagation(); editUsuario('${doc.id}')">Editar</button> <button onclick="event.stopPropagation(); deleteUsuario('${doc.id}')">Borrar</button></td>
+                    `;
+                    usuariosBody.appendChild(row);
+                });
+            } catch (error) {
+                document.getElementById("error-message").innerText = `Error: ${error.message}`;
+            }
+        }
+
+        window.selectUsuario = (id) => {
+            selectedUsuarioId = id;
+            document.getElementById("options").style.display = "block";
+        }
+
+        window.editUsuario = async (id) => {
+            const newNombre = prompt("Nuevo Nombre:");
+            const newCorreo = prompt("Nuevo Correo:");
+            const usuarioDoc = doc(db, "users", id);
+            await updateDoc(usuarioDoc, {
+                nombre: newNombre,
+                correo: newCorreo
+            });
+            loadUsuarios();
+        }
+
+        window.deleteUsuario = async (id) => {
+            const usuarioDoc = doc(db, "users", id);
+            await deleteDoc(usuarioDoc);
+            loadUsuarios();
+        }
+
+        window.toggleMenu = () => {
+            var menu = document.getElementById("menu");
+            if (menu.style.display === "block") {
+                menu.style.display = "none";
+            } else {
+                menu.style.display = "block";
+            }
+        }
+        window.editUsuario = (id) => {
+            selectedUsuarioId = id;
+            const editForm = document.getElementById("editForm");
+            editForm.style.display = "block";
+        }
+
+        // Función para confirmar la edición
+        window.confirmEdit = async () => {
+            const newNombre = document.getElementById("newNombre").value;
+            const newCorreo = document.getElementById("newCorreo").value;
+            const usuarioDoc = doc(db, "users", selectedUsuarioId);
+            await updateDoc(usuarioDoc, {
+                nombre: newNombre,
+                correo: newCorreo
+            });
+            document.getElementById("editForm").style.display = "none";
+            loadUsuarios();
+        }
+
+        // Función para cancelar la edición
+        window.cancelEdit = () => {
+            document.getElementById("editForm").style.display = "none";
+        }
+        window.filterTable = () => {
+            const input = document.getElementById("searchInput");
+            const filter = input.value.toUpperCase();
+            const table = document.getElementById("usuariosTable");
+            const rows = table.getElementsByTagName("tr");
+
+            // Recorre todas las filas y oculta las que no coinciden con el filtro
+            for (let i = 0; i < rows.length; i++) {
+                const td = rows[i].getElementsByTagName("td")[2]; // Filtra por la tercera columna (Correo)
+                if (td) {
+                    const txtValue = td.textContent || td.innerText;
+                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                        rows[i].style.display = "";
+                    } else {
+                        rows[i].style.display = "none";
+                    }
+                }
+            }
+        }
+        window.agregarUsuario = async () => {
+            const newNombre = prompt("Ingrese el nombre del nuevo usuario:");
+            const newCorreo = prompt("Ingrese el correo del nuevo usuario:");
+            
+            try {
+                const docRef = await addDoc(collection(db, "users"), {
+                    nombre: newNombre,
+                    correo: newCorreo
+                });
+                console.log("Usuario agregado con ID: ", docRef.id);
+                loadUsuarios(); // Vuelve a cargar la lista de usuarios después de agregar uno nuevo
+            } catch (error) {
+                console.error("Error al agregar usuario: ", error);
+                document.getElementById("error-message").innerText = `Error al agregar usuario: ${error.message}`;
+            }
+        }
+    </script>
+</body>
+</html>

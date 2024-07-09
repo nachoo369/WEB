@@ -1,0 +1,151 @@
+/* Estilos para la barra de navegación */
+.navbar {
+    width: 100%;
+    background-color: #0055B7;
+    padding: 10px 0; /* Ajusta el espaciado superior e inferior de la navbar */
+    position: fixed; /* Fija la barra de navegación en la parte superior */
+    top: 0;
+    left: 0;
+    z-index: 1000; /* Asegura que la navbar esté por encima de otros elementos */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.navbar img {
+    height: 50px;
+    margin-left: 20px; /* Espacio izquierdo para el logo */
+}
+
+/* Estilos para los botones de navegación */
+.nav-buttons {
+    display: flex;
+    margin-right: 20px; /* Espacio derecho para los botones */
+}
+
+.nav-buttons button {
+    background-color: white;
+    color: blue;
+    border: none;
+    padding: 10px 20px;
+    margin-left: 10px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+.nav-buttons button:hover {
+    background-color: lightgray;
+}
+
+/* Estilos para el ícono del menú */
+.menu-icon {
+    font-size: 30px;
+    cursor: pointer;
+    color: white;
+    margin-right: 20px; /* Espacio derecho para el ícono del menú */
+}
+
+.nav-buttons {
+    display: flex;
+}
+
+.nav-buttons button {
+    background-color: white;
+    color: blue;
+    border: none;
+    padding: 10px 20px;
+    margin-left: 10px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+.nav-buttons button:hover {
+    background-color: lightgray;
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 60px;
+    right: 20px;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+}
+
+.dropdown-menu button {
+    padding: 10px 20px;
+    border: none;
+    background-color: white;
+    cursor: pointer;
+    text-align: left;
+    width: 100%;
+}
+
+.dropdown-menu button:hover {
+    background-color: lightgray;
+}
+
+.content {
+    text-align: center;
+    padding: 50px;
+}
+
+.content .button-container {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 30px;
+}
+
+.content .button-section {
+    flex: 1;
+    text-align: center;
+}
+
+.content .button-section h2 {
+    margin-bottom: 20px;
+}
+
+.content button {
+    background-color: blue;
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+.content button:hover {
+    background-color: darkblue;
+}
+
+.image-container {
+    position: relative;
+    text-align: center;
+    color: white;
+    margin-bottom: 30px;
+}
+
+.image-container img {
+    width: 100%;
+    max-width: 1500px;
+    height: auto;
+}
+
+.image-container .overlay-text {
+    position: fixed;
+    top: 50%;
+    left: 80%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(0, 94, 255, 0.5);
+    padding: 10px 50px;
+    border-radius: 5px;
+    font-size: 50px;
+}

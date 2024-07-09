@@ -100,5 +100,3 @@ function showDialog(title, message) {
         dialogOverlay.style.display = 'none';
     });
 }
-
-

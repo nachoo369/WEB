@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historial de Reservas</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: white;
+            margin: 0;
+            padding: 0;
+        }
+
+        .content {
+            padding: 50px;
+            text-align: center;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table, th, td {
+            border: 1px solid black;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+        }
+
+        th {
+            background-color: blue;
+            color: white;
+        }
+
+        tr:hover {
+            background-color: #f5f5f5;
+            cursor: pointer;
+        }
+
+        .options {
+            margin-top: 20px;
+        }
+
+        .options button {
+            background-color: blue;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .options button:hover {
+            background-color: darkblue;
+        }
+
+        .error-message {
+            color: red;
+            margin-top: 20px;
+        }
+        #editForm {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            border: 1px solid blue;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px; /* Ancho del menú */
+        }
+
+        #editForm input,
+        #editForm button {
+            display: block;
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        #editForm label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        #editForm button {
+            background-color: blue;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        #editForm button:hover {
+            background-color: darkblue;
+        }
+        .search-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .search-container input[type=text] {
+            padding: 10px;
+            margin: 5px;
+            width: 300px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <img src="logo_ula.png" alt="Logo" onclick="location.href='admin_dashboard.html'">
+        <div class="nav-buttons">
+            <button onclick="location.href='admin_dashboard.html'">Dashboard</button>
+        </div>
+        <div class="menu-icon" onclick="toggleMenu()">☰</div>
+    </div>
+    <div class="content">
+        <h1>Historial de Reservas</h1>
+        <div class="search-container">
+            <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="Buscar por nombre...">
+        </div>
+        <table id="reservasTable">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Patente</th>
+                    <th>Lugar</th>
+                    <th>Hora Inicio</th>
+                    <th>Hora Fin</th>
+                    <th>Activo</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="reservasBody">
+                <!-- Las filas se llenarán dinámicamente desde Firestore -->
+            </tbody>
+        </table>
+        <div class="options" id="options" style="display:none;">
+            <button onclick="editReserva()">Editar</button>
+            <button onclick="deleteReserva()">Borrar</button>
+        </div>
+        <div class="error-message" id="error-message"></div>
+        <div id="editForm" style="display:none;">
+            <input type="text" id="newNombre" placeholder="Nuevo Nombre">
+            <input type="text" id="newPatente" placeholder="Nueva Patente">
+            <input type="text" id="newLugar" placeholder="Nuevo Lugar">
+            <input type="text" id="newHoraInicio" placeholder="Nueva Hora Inicio">
+            <input type="text" id="newHoraFin" placeholder="Nueva Hora Fin">
+            <label for="newActiva">¿Está activo?</label>
+            <input type="checkbox" id="newActiva">
+            <button onclick="confirmEdit()">Guardar</button>
+            <button onclick="cancelEdit()">Cancelar</button>
+        </div>
+    </div>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-app.js";
+        import { getFirestore, collection, getDocs, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-auth.js";
+
+        // Tu configuración de Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyDPQHtLTQCPoQSAROQHKpFcDN-xuKkYlzg",
+            authDomain: "tallerii-4104d.firebaseapp.com",
+            projectId: "tallerii-4104d",
+            storageBucket: "tallerii-4104d.appspot.com",
+            messagingSenderId: "809208530029",
+            appId: "1:809208530029:web:e823b1a85e167ec9cbab64",
+            measurementId: "G-0E1TRG4GFF"
+        };
+
+        // Inicializar Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        let selectedReservaId = null;
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // Usuario autenticado
+                loadReservas();
+            } else {
+                // No hay usuario autenticado
+                document.getElementById("error-message").innerText = "Error: No hay usuario autenticado.";
+            }
+        });
+
+        async function loadReservas() {
+            try {
+                const querySnapshot = await getDocs(collection(db, "reservas"));
+                const reservasBody = document.getElementById("reservasBody");
+                reservasBody.innerHTML = "";
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    const row = document.createElement("tr");
+                    row.onclick = () => selectReserva(doc.id);
+                    row.innerHTML = `
+                        <td>${doc.id}</td>
+                        <td>${data.usuario}</td>
+                        <td>${data.patente}</td>
+                        <td>${data.lugar}</td>
+                        <td>${data.hora_inicio}</td>
+                        <td>${data.hora_fin}</td>
+                        <td>${data.activa}</td>
+                        <td><button onclick="event.stopPropagation(); editReserva('${doc.id}')">Editar</button> <button onclick="event.stopPropagation(); deleteReserva('${doc.id}')">Borrar</button></td>
+                    `;
+                    reservasBody.appendChild(row);
+                });
+            } catch (error) {
+                document.getElementById("error-message").innerText = `Error: ${error.message}`;
+            }
+        }
+
+        window.selectReserva = (id) => {
+            selectedReservaId = id;
+            document.getElementById("options").style.display = "block";
+        }
+
+        window.editReserva = async (id) => {
+            const newName = prompt("Nuevo Nombre:");
+            const newPatente = prompt("Nueva Patente:");
+            const newLugar = prompt("Nuevo Lugar:");
+            const newHoraInicio = prompt("Nueva Hora Inicio:");
+            const newHoraFin = prompt("Nueva Hora Fin:");
+            const newActiva = confirm("¿Está activo?");
+            const reservaDoc = doc(db, "reservas", id);
+            await updateDoc(reservaDoc, {
+                name: newName,
+                patente: newPatente,
+                lugar: newLugar,
+                hora_inicio: newHoraInicio,
+                hora_fin: newHoraFin,
+                activa: newActiva
+            });
+            loadReservas();
+        }
+
+        window.deleteReserva = async (id) => {
+            const reservaDoc = doc(db, "reservas", id);
+            await deleteDoc(reservaDoc);
+            loadReservas();
+        }
+
+        window.editReserva = (id) => {
+            selectedReservaId = id;
+            const editForm = document.getElementById("editForm");
+            editForm.style.display = "block";
+        }
+
+        // Función para confirmar la edición
+        window.confirmEdit = async () => {
+            const newNombre = document.getElementById("newNombre").value;
+            const newPatente = document.getElementById("newPatente").value;
+            const newLugar = document.getElementById("newLugar").value;
+            const newHoraInicio = document.getElementById("newHoraInicio").value;
+            const newHoraFin = document.getElementById("newHoraFin").value;
+            const newActiva = document.getElementById("newActiva").checked;
+
+            const reservaDoc = doc(db, "reservas", selectedReservaId);
+            await updateDoc(reservaDoc, {
+                usuario: newNombre,
+                patente: newPatente,
+                lugar: newLugar,
+                hora_inicio: newHoraInicio,
+                hora_fin: newHoraFin,
+                activa: newActiva
+            });
+            document.getElementById("editForm").style.display = "none";
+            loadReservas();
+        }
+
+        // Función para cancelar la edición
+        window.cancelEdit = () => {
+            document.getElementById("editForm").style.display = "none";
+        }
+        window.filterTable = () => {
+            const input = document.getElementById("searchInput");
+            const filter = input.value.toUpperCase();
+            const table = document.getElementById("reservasTable");
+            const rows = table.getElementsByTagName("tr");
+
+            // Recorre todas las filas y oculta las que no coinciden con el filtro
+            for (let i = 0; i < rows.length; i++) {
+                const td = rows[i].getElementsByTagName("td")[1]; // Filtra por la segunda columna (Nombre)
+                if (td) {
+                    const txtValue = td.textContent || td.innerText;
+                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                        rows[i].style.display = "";
+                    } else {
+                        rows[i].style.display = "none";
+                    }
+                }
+            }
+        }
+    </script>
+    <script src="navbar.js"></script>
+</body>
+</html>

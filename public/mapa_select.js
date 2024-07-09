@@ -67,26 +67,24 @@ function buildMapaLugares() {
     const container = document.getElementById('mapa-lugares-container');
     container.innerHTML = '';
 
+    // Fila con lugar preferencial
+    container.appendChild(createFilaLugaresConPreferencial(6, 3));
+  
+    // Fila superior
+    container.appendChild(createFilaLugares(0, 6));
+
+  
     // Entrada
     container.appendChild(document.createTextNode(' Entrada '));
-
-    // Contenedor para las filas
-    const rowsContainer = document.createElement('div');
-    rowsContainer.className = 'filas-container';
-    container.appendChild(rowsContainer);
-
-    // Fila superior
-    rowsContainer.appendChild(createFilaLugares(0, 5));
-    rowsContainer.appendChild(createFilaLugaresConPreferencial(5, 3));
-
+  
     // Fila inferior
-    rowsContainer.appendChild(createFilaLugares(8, 6));
-
+    container.appendChild(createFilaLugares(8, 6));
+  
     // Fila con 7 lugares
-    rowsContainer.appendChild(createFilaLugares(14, 7));
-
+    container.appendChild(createFilaLugares(14, 7));
+  
     // Fila con 7 lugares
-    rowsContainer.appendChild(createFilaLugares(21, 7));
+    container.appendChild(createFilaLugares(21, 7));
 }
 
 function createFilaLugares(startIndex, count) {
@@ -106,6 +104,7 @@ function createFilaLugaresConPreferencial(startIndex, count) {
     }
     return row;
 }
+
 function createLugar(index) {
     const lugar = document.createElement('div');
     lugar.className = 'lugar';
@@ -116,7 +115,7 @@ function createLugar(index) {
         if (disponibilidadLugares[index] === false) {
             showDialog('Estacionamiento no disponible', 'Este estacionamiento no está disponible.');
         } else {
-            toggleSeleccion(index); // Llama a toggleSeleccion aquí
+            toggleSeleccion(index);
         }
     });
 
@@ -133,12 +132,13 @@ function createLugarPreferencial(index) {
         if (disponibilidadLugares[index] === false) {
             showDialog('Estacionamiento no disponible', 'Este estacionamiento no está disponible.');
         } else {
-            toggleSeleccion(index); // Llama a toggleSeleccion aquí
+            toggleSeleccion(index);
         }
     });
 
     return lugar;
 }
+
 function getLugarColor(index) {
     if (lugarSeleccionado === index) {
         return 'green';

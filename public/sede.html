@@ -6,17 +6,51 @@
     <title>Selección de Sede</title>
     <link rel="stylesheet" href="styles.css">
     <style>
-        body {
+                body {
             font-family: Arial, sans-serif;
             background-color: white;
             margin: 0;
             padding: 0;
             text-align: center;
         }
+        .navbar {
+            width: 100%;
+            background-color: #0055B7;
+            padding: 10px 0; /* Ajusta el espaciado superior e inferior de la navbar */
+            position: fixed; /* Fija la barra de navegación en la parte superior */
+            top: 0;
+            left: 0;
+            z-index: 1000; /* Asegura que la navbar esté por encima de otros elementos */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .navbar img {
+            height: 50px;
+            margin-left: 20px; /* Espacio izquierdo para el logo */
+        }
+        .nav-buttons {
+            display: flex;
+            margin-right: 20px; /* Espacio derecho para los botones */
+        }
+        .nav-buttons button {
+            background-color: white;
+            color: blue;
+            border: none;
+            padding: 10px 20px;
+            margin-left: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        .nav-buttons button:hover {
+            background-color: lightgray;
+        }
         .dropdown {
             position: relative;
             display: inline-block;
-            margin-left: 20px;
+            margin-left: 20px; /* Ajusta según tu diseño */
+            /* Alineación hacia la izquierda */
             text-align: left;
         }
         .dropdown-content {
@@ -28,8 +62,8 @@
             z-index: 1;
             padding: 5px 0;
             border-radius: 5px;
-            right: 0;
-            top: 100%;
+            right: 0; /* Ajusta para que el menú aparezca al lado */
+            top: 100%; /* Ajusta la posición vertical según tu diseño */
         }
         .dropdown-content a {
             color: black;
@@ -47,38 +81,9 @@
         .dropdown:hover .dropbtn {
             background-color: #ffffff13;
         }
-        .navbar {
-            width: 100%;
-            background-color: #0055B7;
-            padding: 10px 0;
-            position: fixed;
-            top: 0;
-            left: 0;
-            z-index: 1000;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .navbar img {
-            height: 50px;
-            margin-left: 20px;
-        }
-        .nav-buttons {
-            display: flex;
-            margin-right: 20px;
-        }
-        .nav-buttons button {
-            background-color: white;
-            color: blue;
-            border: none;
-            padding: 10px 20px;
-            margin-left: 10px;
-            cursor: pointer;
-            border-radius: 5px;
-            transition: background-color 0.3s;
-        }
-        .nav-buttons button:hover {
-            background-color: lightgray;
+        .content {
+            text-align: center;
+            padding: 50px;
         }
         .imagenes-container {
             display: flex;
@@ -86,42 +91,33 @@
             margin-top: 20px;
         }
         .imagen-interactiva-container {
-            margin: 10px;
-            text-align: center;
-            position: relative; /* Añadido para alinear el título */
+            margin: 10px; /* Espacio entre contenedores de imágenes */
+            text-align: center; /* Centrar texto */
         }
         .imagen-interactiva {
-            width: 300px;
-            height: 200px;
+            width: 300px; /* Ancho fijo */
+            height: 200px; /* Altura fija */
             transition: transform 0.2s;
-            object-fit: cover;
-            border-radius: 5px;
+            object-fit: cover; /* Ajuste del tamaño de la imagen */
         }
         .imagen-interactiva:hover {
-            transform: scale(1.1);
+            transform: scale(1.1); /* Zoom al pasar el cursor */
             cursor: pointer;
         }
         .titulo-imagen {
-            position: absolute;
-            bottom: 10px; /* Ajusta según tu diseño */
-            left: 0;
-            right: 0;
-            margin: 0 auto;
-            background-color: rgba(255, 255, 255, 0.7); /* Fondo semi-transparente */
-            padding: 5px 10px;
-            border-radius: 5px;
+            margin-top: 10px; /* Espacio entre la imagen y el título */
             font-weight: bold;
         }
         h2 {
-            margin-top: 100px; /* Espacio arriba del título principal */
+            margin-top: 20px; /* Espacio arriba del título principal */
             font-size: 28px;
-            color: #333;
+            color: #333; /* Color del texto del título */
         }
     </style>
 </head>
 <body>
 
-<!-- Barra de navegación -->
+<!-- Copia de la barra de navegación anterior -->
 <div class="navbar">
     <img src="logo_ula.png" alt="Logo" onclick="location.href='index.html'">
     <div class="nav-buttons">
@@ -138,11 +134,9 @@
     </div>
 </div>
 
-<!-- Título -->
 <div>
     <h2>2. Paso Dos: Selecciona una Sede</h2>
 </div>
-
 <!-- Imágenes interactivas -->
 <div class="imagenes-container">
     <div class="imagen-interactiva-container" onclick="irAEstacionamiento('campus-chuyaca')">
@@ -156,23 +150,16 @@
 </div>
 
 <script>
+    // Función para redirigir a estacionamiento.html con la sede seleccionada
     function irAEstacionamiento(sede) {
         if (sede === 'campus-chuyaca') {
             window.location.href = 'estacionamiento_c.html';
         } else if (sede === 'campus-meyer') {
             window.location.href = 'estacionamiento.html';
         } else {
+            // Manejo para otros casos o errores
             console.error('Sede no válida');
         }
-    }
-
-    function toggleDropdown(id) {
-        const dropdown = document.getElementById(id);
-        dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
-    }
-
-    function logout() {
-        console.log('Cerrar sesión');
     }
 </script>
 

@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vehículos Registrados</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: white;
+            margin: 0;
+            padding: 0;
+        }
+
+        .content {
+            padding: 50px;
+            text-align: center;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table, th, td {
+            border: 1px solid black;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+        }
+
+        th {
+            background-color: blue;
+            color: white;
+        }
+
+        tr:hover {
+            background-color: #f5f5f5;
+            cursor: pointer;
+        }
+
+        .options {
+            margin-top: 20px;
+        }
+
+        .options button {
+            background-color: blue;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .options button:hover {
+            background-color: darkblue;
+        }
+
+        .error-message {
+            color: red;
+            margin-top: 20px;
+        }
+
+        /* Estilos para el diálogo de edición */
+        #editDialogOverlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+
+        #editDialog {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+        }
+
+        #editDialog h2 {
+            margin-top: 0;
+        }
+
+        #editDialog input {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            box-sizing: border-box;
+        }
+
+        #editDialog button {
+            background-color: blue;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin-top: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        #editDialog button:hover {
+            background-color: darkblue;
+        }
+        .search-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .search-container input[type=text] {
+            padding: 10px;
+            margin: 5px;
+            width: 300px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <img src="logo_ula.png" alt="Logo" onclick="location.href='admin_dashboard.html'">
+        <div class="nav-buttons">
+            <button onclick="location.href='admin_dashboard.html'">Dashboard</button>
+            <button onclick="logout()">Cerrar Sesión</button>
+        </div>
+        <div class="menu-icon" onclick="toggleMenu()">☰</div>
+    </div>
+    <div class="content">
+        <h1>Vehículos Registrados</h1>
+        <div class="search-container">
+            <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="Buscar por patente...">
+        </div>
+        <table id="vehiculosTable">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Color</th>
+                    <th>Modelo</th>
+                    <th>Patente</th>
+                    <th>Nombre del Usuario</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="vehiculosBody">
+                <!-- Las filas se llenarán dinámicamente desde Firestore -->
+            </tbody>
+        </table>
+        <div id="editDialogOverlay">
+            <div id="editDialog">
+                <h2>Editar Vehículo</h2>
+                <label for="editColor">Color:</label>
+                <input type="text" id="editColor" name="editColor"><br>
+                <label for="editModelo">Modelo:</label>
+                <input type="text" id="editModelo" name="editModelo"><br>
+                <label for="editPatente">Patente:</label>
+                <input type="text" id="editPatente" name="editPatente"><br>
+                <button onclick="saveChanges()">Guardar</button>
+                <button onclick="closeEditDialog()">Cancelar</button>
+            </div>
+        </div>
+        <div class="options" id="options" style="display:none;">
+            <button onclick="showEditDialog()">Editar</button>
+            <button onclick="deleteVehiculo()">Borrar</button>
+        </div>
+        <div class="error-message" id="error-message"></div>
+    </div>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-app.js";
+        import { getFirestore, collection, getDocs, doc, updateDoc, deleteDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-auth.js";
+
+        // Tu configuración de Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyDPQHtLTQCPoQSAROQHKpFcDN-xuKkYlzg",
+            authDomain: "tallerii-4104d.firebaseapp.com",
+            projectId: "tallerii-4104d",
+            storageBucket: "tallerii-4104d.appspot.com",
+            messagingSenderId: "809208530029",
+            appId: "1:809208530029:web:e823b1a85e167ec9cbab64",
+            measurementId: "G-0E1TRG4GFF"
+        };
+
+        // Inicializar Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        let selectedVehiculoId = null;
+        let usersMap = {};
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // Usuario autenticado
+                loadUsers();
+            } else {
+                // No hay usuario autenticado
+                document.getElementById("error-message").innerText = "Error: No hay usuario autenticado.";
+            }
+        });
+
+        async function loadUsers() {
+            try {
+                const querySnapshot = await getDocs(collection(db, "users"));
+                querySnapshot.forEach((doc) => {
+                    usersMap[doc.id] = doc.data().nombre;
+                });
+                loadVehiculos();
+            } catch (error) {
+                document.getElementById("error-message").innerText = `Error al cargar usuarios: ${error.message}`;
+            }
+        }
+
+        async function loadVehiculos() {
+            try {
+                const querySnapshot = await getDocs(collection(db, "vehiculos"));
+                const vehiculosBody = document.getElementById("vehiculosBody");
+                vehiculosBody.innerHTML = "";
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    const row = document.createElement("tr");
+                    row.onclick = () => selectVehiculo(doc.id);
+                    row.innerHTML = `
+                        <td>${doc.id}</td>
+                        <td>${data.color}</td>
+                        <td>${data.modelo}</td>
+                        <td>${data.patente}</td>
+                        <td>${usersMap[data.userId] || 'Desconocido'}</td>
+                        <td><button onclick="event.stopPropagation(); showEditDialog('${doc.id}')">Editar</button> <button onclick="event.stopPropagation(); deleteVehiculo('${doc.id}')">Borrar</button></td>
+                    `;
+                    vehiculosBody.appendChild(row);
+                });
+            } catch (error) {
+                document.getElementById("error-message").innerText = `Error: ${error.message}`;
+            }
+        }
+
+        window.selectVehiculo = (id) => {
+            selectedVehiculoId = id;
+            document.getElementById("options").style.display = "block";
+        }
+
+        window.showEditDialog = async (id) => {
+            try {
+                selectedVehiculoId = id;
+                const vehiculoDoc = doc(db, "vehiculos", id);
+                const vehiculoSnap = await getDoc(vehiculoDoc);
+                const data = vehiculoSnap.data();
+                
+                // Llenar los campos de edición con los datos actuales del vehículo
+                document.getElementById("editColor").value = data.color;
+                document.getElementById("editModelo").value = data.modelo;
+                document.getElementById("editPatente").value = data.patente;
+
+                // Mostrar el diálogo de edición
+                document.getElementById("editDialogOverlay").style.display = "block";
+            } catch (error) {
+                document.getElementById("error-message").innerText = `Error al abrir el diálogo de edición: ${error.message}`;
+            }
+        }
+
+        window.saveChanges = async () => {
+            try {
+                const editColorInput = document.getElementById('editColor');
+                const editModeloInput = document.getElementById('editModelo');
+                const editPatenteInput = document.getElementById('editPatente');
+
+                // Verificar si los elementos existen antes de intentar acceder a sus valores
+                if (editColorInput && editModeloInput && editPatenteInput) {
+                    const vehiculoDoc = doc(db, "vehiculos", selectedVehiculoId);
+                    await updateDoc(vehiculoDoc, {
+                        color: editColorInput.value,
+                        modelo: editModeloInput.value,
+                        patente: editPatenteInput.value
+                    });
+
+                    // Ocultar el diálogo después de guardar
+                    closeEditDialog();
+
+                    // Recargar la lista de vehículos
+                    loadVehiculos();
+                } else {
+                    throw new Error('Los campos de edición no están disponibles o son nulos.');
+                }
+            } catch (error) {
+                document.getElementById("error-message").innerText = `Error al guardar cambios: ${error.message}`;
+            }
+        }
+
+        window.closeEditDialog = () => {
+            document.getElementById("editDialogOverlay").style.display = "none";
+        }
+
+        window.deleteVehiculo = async (id) => {
+            const vehiculoDoc = doc(db, "vehiculos", id);
+            await deleteDoc(vehiculoDoc);
+            loadVehiculos();
+        }
+
+        window.toggleMenu = () => {
+            var menu = document.getElementById("menu");
+            if (menu.style.display === "block") {
+                menu.style.display = "none";
+            } else {
+                menu.style.display = "block";
+            }
+        }
+        window.filterTable = () => {
+            // Declara variables
+            let filter, table, tr, td, i, txtValue;
+            filter = document.getElementById("searchInput").value.toUpperCase();
+            table = document.getElementById("vehiculosTable");
+            tr = table.getElementsByTagName("tr");
+
+            // Recorre todas las filas y oculta las que no coincidan con la búsqueda
+            for (i = 0; i < tr.length; i++) {
+                td = tr[i].getElementsByTagName("td")[3]; // Cambia el índice para filtrar por patente (0 = ID, 1 = Color, 2 = Modelo, 3 = Patente)
+                if (td) {
+                    txtValue = td.textContent || td.innerText;
+                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                        tr[i].style.display = "";
+                    } else {
+                        tr[i].style.display = "none";
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>

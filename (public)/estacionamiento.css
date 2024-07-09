@@ -60,19 +60,3 @@ main {
     border-radius: 5px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
-.lugares-row {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 10px;
-}
-
-.lugar {
-    width: 40px;
-    height: 40px;
-    margin: 2px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid #ccc;
-    cursor: pointer;
-}

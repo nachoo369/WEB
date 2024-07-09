@@ -3,45 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Estacionamiento ULagos</title>
+    <title>Estacionamientos ULagos</title>
+    <link rel="stylesheet" href="styles.css">
+    <script type="module" src="firebase-config.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-firestore-compat.js"></script>
     <style>
+    
         body {
             font-family: Arial, sans-serif;
             background-color: white;
             margin: 0;
             padding: 0;
-        }
-
-        .navbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: #0055B7;
-            padding: 10px 20px;
-            color: white; /* Añadido: color de texto blanco */
-        }
-
-        .navbar img {
-            height: 50px;
-        }
-
-        .navbar .nav-buttons {
-            display: flex;
-        }
-
-        .navbar .nav-buttons button {
-            background-color: white;
-            color: blue;
-            border: none;
-            padding: 10px 20px;
-            margin-left: 10px;
-            cursor: pointer;
-            border-radius: 5px;
-            transition: background-color 0.3s;
-        }
-
-        .navbar .nav-buttons button:hover {
-            background-color: lightgray;
         }
 
         .content {
@@ -89,16 +63,24 @@
             border-radius: 5px;
         }
 
-        /* Añadido: Estilos para el formulario */
+        /* Estilos para el formulario */
+        .formulario-container {
+            background-color: rgba(140, 108, 247, 0.275); /* Color de fondo gris */
+            padding: 20px; /* Espacio de relleno */
+            border-radius: 10px; /* Bordes redondeados */
+            max-width: 400px; /* Ancho máximo del contenedor */
+            margin: 0 auto; /* Centra horizontalmente */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Sombra ligera */
+        }
+
         #reservaForm {
             display: flex;
             flex-direction: column;
-            max-width: 300px;
-            margin: 0 auto; /* Centra el formulario horizontalmente */
         }
 
         #reservaForm label {
             color: green;
+            margin-bottom: 5px;
         }
 
         #reservaForm input[type="text"],
@@ -107,15 +89,28 @@
         #reservaForm input[type="email"],
         #reservaForm input[type="password"] {
             background-color: #f2f2f2;
-            padding: 5px;
-            margin-bottom: 10px;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        #reservaForm input[type="text"]:focus,
+        #reservaForm input[type="tel"]:focus,
+        #reservaForm input[type="date"]:focus,
+        #reservaForm input[type="email"]:focus,
+        #reservaForm input[type="password"]:focus {
+            outline: none;
+            border-color: blue;
         }
 
         #reservaForm button[type="button"],
         #reservaForm button[type="submit"] {
             background-color: blue;
             color: white;
-            padding: 8px 12px;
+            padding: 12px;
             border: none;
             cursor: pointer;
             margin-top: 20px; /* Espacio adicional arriba del botón */
@@ -134,86 +129,109 @@
             margin-top: 20px; /* Espacio adicional arriba del mensaje */
         }
     </style>
-    <script src="firebase-config.js" type="module"></script>
 </head>
 <body>
     <div class="navbar">
         <img src="logo_ula.png" alt="Logo" onclick="location.href='index.html'">
         <div class="nav-buttons">
-            <button onclick="location.href='login.html'">Ingresar</button>
-            <button onclick="location.href='registro_ulagos.html'">Registro</button>
-            <button onclick="location.href='ayuda.html'">Ayuda</button>
+            <button id="user-name" style="display: none;"></button>
         </div>
+        <div class="menu-icon" onclick="toggleMenu()">☰</div>
     </div>
-    <div class="content">
-        <h1 style="color: blue;">Estacionamientos Chuyaca - Meyer</h1>
-        <form id="reservaForm" onsubmit="registrar(event)">
-            <label for="nombre">Nombre y Apellido:</label>
-            <input type="text" id="nombre" name="nombre" pattern="[A-Za-zÁÉÍÓÚáéíóúÜüÑñ\s]+ [A-Za-zÁÉÍÓÚáéíóúÜüÑñ\s]+" title="Ingrese un nombre y apellido válido (ej. Diego Gallegos)" required>
+    <div id="menu" class="dropdown-menu" style="display: none;">
+        <button onclick="location.href='login.html'" id="login-btn">Ingresar</button>
+        <button onclick="location.href='registro_ulagos.html'" id="register-btn">Registrar</button>
+        <button onclick="location.href='ayuda.html'" id="help-btn">Ayuda</button>
+        <button onclick="location.href='reservar.html'" id="reserve-btn" style="display: none;">Reservar</button>
+        <button onclick="location.href='historial.html'" id="history-btn" style="display: none;">Historial</button>
+        <button onclick="logout()" id="logout-btn" style="display: none;">Cerrar Sesión</button>
+    </div>
+    <body>
+        <!-- Navbar y contenido -->
+        <div class="content">
+            <h1 style="color: blue;">Estacionamientos Chuyaca - Meyer</h1>
+            <div class="formulario-container">
+                <form id="reservaForm">
+                    <label for="nombre">Nombre y Apellido:</label>
+                    <input type="text" id="nombre" name="nombre" pattern="[A-Za-zÁÉÍÓÚáéíóúÜüÑñ\s]+ [A-Za-zÁÉÍÓÚáéíóúÜüÑñ\s]+" title="Ingrese un nombre y apellido válido (ej. Diego Gallegos)" required>
     
-            <label for="telefono">Teléfono (9XXXXXXXX):</label>
-            <input type="tel" id="telefono" name="telefono" pattern="9[0-9]{8}" title="Ingrese un número de teléfono válido (ej. 912345678)" required>
-            
-            <label for="correo">Correo Electrónico (solo @ulagos.cl o @alumnos.ulagos.cl):</label>
-            <input type="email" id="correo" name="correo" required>
+                    <label for="telefono">Teléfono (9XXXXXXXX):</label>
+                    <input type="tel" id="telefono" name="telefono" pattern="9[0-9]{8}" title="Ingrese un número de teléfono válido (ej. 912345678)" required>
+                    
+                    <label for="correo">Correo Electrónico (solo @ulagos.cl o @alumnos.ulagos.cl):</label>
+                    <input type="email" id="correo" name="correo" required>
     
-            <label for="contrasena">Contraseña (Mayúscula, minúscula, números y signo):</label>
-            <input type="password" id="contrasena" name="contrasena" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*\W).{8,}$" required>
+                    <label for="contrasena">Contraseña (Mayúscula, minúscula, números y signo):</label>
+                    <input type="password" id="contrasena" name="contrasena" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*\W).{8,}$" required>
     
-            <label for="confirmarContrasena">Confirmar Contraseña:</label>
-            <input type="password" id="confirmarContrasena" name="confirmarContrasena" required oninput="validarConfirmacionContrasena()">
+                    <label for="confirmarContrasena">Confirmar Contraseña:</label>
+                    <input type="password" id="confirmarContrasena" name="confirmarContrasena" required oninput="validarConfirmacionContrasena()">
     
-            <script>
-                function validarContrasena() {
-                    const inputContrasena = document.getElementById('contrasena');
-                    const contrasena = inputContrasena.value;
-                    const contrasenaPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*\W).{8,}$/;
+                    <button type="button" onclick="registrarUsuario()">Registrar</button>
+                </form>
+                <div id="mensajeReserva"></div>
+            </div>
+        </div>
     
-                    if (!contrasenaPattern.test(contrasena)) {
-                        inputContrasena.setCustomValidity('La contraseña debe incluir al menos una mayúscula, una minúscula, un número y un carácter especial');
-                    } else {
-                        inputContrasena.setCustomValidity('');
-                    }
-                }
-    
-                function validarConfirmacionContrasena() {
-                    const contrasena = document.getElementById('contrasena').value;
-                    const confirmarContrasena = document.getElementById('confirmarContrasena').value;
-    
-                    if (contrasena !== confirmarContrasena) {
-                        document.getElementById('confirmarContrasena').setCustomValidity('Las contraseñas no coinciden');
-                    } else {
-                        document.getElementById('confirmarContrasena').setCustomValidity('');
-                    }
-                }
-    
-                function validarNombre() {
-                    const inputNombre = document.getElementById('nombre');
-                    const nombre = inputNombre.value;
-                    const nombrePattern = /^[A-Za-zÁÉÍÓÚáéíóúÜüÑñ\s]+ [A-Za-zÁÉÍÓÚáéíóúÜüÑñ\s]+$/;
-    
-                    if (!nombrePattern.test(nombre)) {
-                        inputNombre.setCustomValidity('Por favor, ingrese un nombre y apellido válido (ej. Diego Gallegos)');
-                    } else {
-                        inputNombre.setCustomValidity('');
-                    }
-                }
-    
-                function validarAntesDeRegistrar() {
-                    validarNombre();
-                    validarContrasena();
-                    validarConfirmacionContrasena();
-                    if (document.getElementById('nombre').checkValidity() && document.getElementById('contrasena').checkValidity() && document.getElementById('confirmarContrasena').checkValidity()) {
-                        // Ejecutar la función de registrar definida globalmente
-                        registrar(event);
-                    }
-                }
-            </script>
-            <script src="firebase-config.js" type="module"></script>
+        <script src="navbar.js"></script>
+        <script>
+            // Inicialización de Firebase
+            const firebaseConfig = {
+                apiKey: "AIzaSyDPQHtLTQCPoQSAROQHKpFcDN-xuKkYlzg",
+                authDomain: "tallerii-4104d.firebaseapp.com",
+                projectId: "tallerii-4104d",
+                storageBucket: "tallerii-4104d.appspot.com",
+                messagingSenderId: "809208530029",
+                appId: "1:809208530029:web:e823b1a85e167ec9cbab64",
+                measurementId: "G-0E1TRG4GFF"
+            };
+            firebase.initializeApp(firebaseConfig);
+            const auth = firebase.auth();
+            const db = firebase.firestore();
 
-            <button type="button" onclick="validarAntesDeRegistrar()">Registrar</button>
-        </form>
-        <div id="mensajeReserva"></div>
-    </div>
-</body>
-</html>
+            db.enablePersistence()
+                .then(() => {
+                    console.log("Firestore habilitado localmente.");
+                })
+                .catch((error) => {
+                    console.error("Error al habilitar Firestore localmente:", error);
+                });
+    
+            // Función para registrar un usuario
+            function registrarUsuario() {
+                const nombre = document.getElementById('nombre').value;
+                const correo = document.getElementById('correo').value;
+                const contrasena = document.getElementById('contrasena').value;
+                const confirmarContrasena = document.getElementById('confirmarContrasena').value;
+    
+                if (contrasena !== confirmarContrasena) {
+                    document.getElementById('mensajeReserva').textContent = "Las contraseñas no coinciden.";
+                    return;
+                }
+    
+                auth.createUserWithEmailAndPassword(correo, contrasena)
+                    .then((userCredential) => {
+                        const user = userCredential.user;
+                        console.log("Usuario registrado:", user.uid);
+    
+                        return db.collection('users').doc(user.uid).set({
+                            nombre: nombre,
+                            correo: correo,
+                            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                    })
+                    .then(() => {
+                        console.log("Datos adicionales guardados en Firestore.");
+                        document.getElementById("mensajeReserva").textContent = "Usuario registrado con éxito.";
+                        setTimeout(() => {
+                            window.location.href = 'login.html';
+                        }, 3000); // Redirigir después de 3 segundos
+                    })
+                    .catch((error) => {
+                        console.error("Error al registrar usuario:", error.message);
+                        document.getElementById("mensajeReserva").textContent = `Error: ${error.message}`;
+                    });
+            }
+        </script>
+    </body>
+    </html>

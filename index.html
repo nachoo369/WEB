@@ -6,13 +6,65 @@
     <title>Estacionamiento ULagos</title>
     <!-- Enlazar archivo CSS externo -->
     <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif; /* Fuente más moderna */
+            background-color: #f4f4f4; /* Fondo general más claro */
+            margin: 0;
+            padding: 0;
+        }
+        .content {
+            padding: 20px;
+        }
+        .image-container img {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+        }
+        .button-container {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+        .button-section {
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            width: 45%;
+        }
+        .visita-section {
+            background-color: #b4fed3; /* Fondo azul claro para visitas */
+        }
+        .ulagos-section {
+            background-color: #b3e5fc; /* Fondo azul más fuerte para ULagos */
+        }
+        .button-section h2 {
+            margin-bottom: 10px;
+            font-family: 'Arial', sans-serif; /* Fuente más moderna */
+        }
+        .button-section p {
+            margin-bottom: 20px;
+            font-family: 'Arial', sans-serif; /* Fuente más moderna */
+        }
+        .button-section button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            font-family: 'Arial', sans-serif; /* Fuente más moderna */
+        }
+        .visita-button {
+            background-color: #00796b; /* Azul fuerte para visitas */
+        }
+        .ulagos-button {
+            background-color: #01579b; /* Azul más fuerte para ULagos */
+        }
+    </style>
 </head>
 <body>
     <div class="navbar">
         <img src="logo_ula.png" alt="Logo" onclick="location.href='index.html'">
-        <div class="nav-buttons">
-            <button id="user-name" style="display: none;"></button>
-        </div>
         <div class="menu-icon" onclick="toggleMenu()">☰</div>
     </div>
     <div id="menu" class="dropdown-menu" style="display: none;">
@@ -28,11 +80,15 @@
             <img src="parking_image.jpg" alt="Parking Image">
         </div>
         <div class="button-container">
-            <div class="button-section">
-                <button onclick="location.href='registro_visitas.html'">Usuario Visita</button>
+            <div class="button-section visita-section">
+                <h2>Visitas</h2>
+                <p>Si usted es visita en Universidad De Los Lagos ingrese presionando el botón Continuar para acceder a registro de visitas.</p>
+                <button class="visita-button" onclick="location.href='registro_visitas.html'">Continuar</button>
             </div>
-            <div class="button-section">
-                <button onclick="location.href='registro_ulagos.html'">Usuario Ulagos</button>
+            <div class="button-section ulagos-section">
+                <h2>ULAGOS</h2>
+                <p>Si usted es Funcionario o estudiante de Universidad de los Lagos ingrese presionando el botón Continuar</p>
+                <button class="ulagos-button" onclick="location.href='registro_ulagos.html'">Continuar</button>
             </div>
         </div>
     </div>

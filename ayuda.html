@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ayuda - Estacionamiento ULagos</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: white;
+            margin: 0;
+            padding: 0;
+        }
+
+        .content {
+            text-align: center;
+            padding: 50px;
+        }
+
+        .formulario-container {
+            background-color: rgba(140, 108, 247, 0.275);
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 400px;
+            margin: 0 auto;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        #incidentForm {
+            display: flex;
+            flex-direction: column;
+        }
+
+        #incidentForm label {
+            color: green;
+            margin-bottom: 5px;
+        }
+
+        #incidentForm input[type="text"],
+        #incidentForm textarea {
+            background-color: #f2f2f2;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        #incidentForm input[type="text"]:focus,
+        #incidentForm textarea:focus {
+            outline: none;
+            border-color: blue;
+        }
+
+        #incidentForm input[type="file"] {
+            margin-bottom: 15px;
+        }
+
+        #incidentForm button[type="submit"] {
+            background-color: blue;
+            color: white;
+            padding: 12px;
+            border: none;
+            cursor: pointer;
+            margin-top: 20px;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        #incidentForm button[type="submit"]:hover {
+            background-color: darkblue;
+        }
+    </style>
+    <script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-storage.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDPQHtLTQCPoQSAROQHKpFcDN-xuKkYlzg",
+            authDomain: "tallerii-4104d.firebaseapp.com",
+            projectId: "tallerii-4104d",
+            storageBucket: "tallerii-4104d.appspot.com",
+            messagingSenderId: "809208530029",
+            appId: "1:809208530029:web:e823b1a85e167ec9cbab64",
+            measurementId: "G-0E1TRG4GFF"
+        };
+        firebase.initializeApp(firebaseConfig);
+
+        var db = firebase.firestore();
+        var storage = firebase.storage();
+
+        function addIncident(data) {
+            db.collection("incidentes_meyer").add(data)
+                .then((docRef) => {
+                    console.log("Document written with ID: ", docRef.id);
+                })
+                .catch((error) => {
+                    console.error("Error adding document: ", error);
+                });
+        }
+
+        function uploadImage(file, callback) {
+            var storageRef = storage.ref('incident_images/' + Date.now() + '-' + file.name);
+            var uploadTask = storageRef.put(file);
+
+            uploadTask.on('state_changed', 
+                function(snapshot) {
+                    var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                    console.log('Upload is ' + progress + '% done');
+                }, 
+                function(error) {
+                    console.error("Error uploading image: ", error);
+                }, 
+                function() {
+                    uploadTask.snapshot.ref.getDownloadURL().then(function(downloadURL) {
+                        callback(downloadURL);
+                    });
+                }
+            );
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('incidentForm').addEventListener('submit', function(event) {
+                event.preventDefault();
+                var name = document.getElementById('name').value;
+                var place = document.getElementById('place').value;
+                var reason = document.getElementById('reason').value;
+                var licensePlate = document.getElementById('licensePlate').value;
+                var userPhone = document.getElementById('userPhone').value;
+                var imageFile = document.getElementById('image').files[0];
+
+                if (imageFile) {
+                    uploadImage(imageFile, function(downloadURL) {
+                        var data = {
+                            userName: name,
+                            lugar: place,
+                            motivo: reason,
+                            patente: licensePlate,
+                            userPhone: userPhone,
+                            foto: downloadURL,
+                            timestamp: new Date().toISOString(),
+                            userId: "USER_ID_PLACEHOLDER"
+                        };
+                        addIncident(data);
+                    });
+                } else {
+                    var data = {
+                        userName: name,
+                        lugar: place,
+                        motivo: reason,
+                        patente: licensePlate,
+                        userPhone: userPhone,
+                        timestamp: new Date().toISOString(),
+                        userId: "USER_ID_PLACEHOLDER"
+                    };
+                    addIncident(data);
+                }
+
+                document.getElementById('incidentForm').reset();
+            });
+        });
+    </script>
+</head>
+<body>
+    <div class="navbar">
+        <img src="logo_ula.png" alt="Logo" onclick="location.href='index.html'">
+        <div class="nav-buttons">
+            <button id="user-name" style="display: none;"></button>
+        </div>
+        <div class="menu-icon" onclick="toggleMenu()">☰</div>
+    </div>
+    <div id="menu" class="dropdown-menu" style="display: none;">
+        <button onclick="location.href='login.html'" id="login-btn">Ingresar</button>
+        <button onclick="location.href='registro_ulagos.html'" id="register-btn">Registrar</button>
+        <button onclick="location.href='ayuda.html'" id="help-btn">Ayuda</button>
+        <button onclick="location.href='reservar.html'" id="reserve-btn" style="display: none;">Reservar</button>
+        <button onclick="location.href='historial.html'" id="history-btn" style="display: none;">Historial</button>
+        <button onclick="logout()" id="logout-btn" style="display: none;">Cerrar Sesión</button>
+    </div>
+    <div class="content">
+        <h1 style="color: blue;">Reportar Incidente</h1>
+        <div class="formulario-container">
+            <form id="incidentForm">
+                <label for="name">Nombre:</label>
+                <input type="text" id="name" name="name" required>
+
+                <label for="lugar">Lugar:</label>
+                <select id="lugar" name="lugar" required>
+                    <option value="Meyer">Meyer</option>
+                    <option value="Chuyaca">Chuyaca</option>
+                </select>
+
+                <label for="reason">Motivo:</label>
+                <textarea id="reason" name="reason" required></textarea>
+
+                <label for="licensePlate">Patente:</label>
+                <input type="text" id="licensePlate" name="licensePlate" required>
+
+                <label for="userPhone">Teléfono del Usuario:</label>
+                <input type="text" id="userPhone" name="userPhone" required>
+
+                <label for="image">Subir Imagen:</label>
+                <input type="file" id="image" name="image" accept="image/*" capture>
+                <button type="submit">Enviar</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Administrador</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: white;
+            margin: 0;
+            padding: 0;
+        }
+
+        .content {
+            text-align: center;
+            padding: 50px;
+        }
+
+        .content h1 {
+            color: blue;
+        }
+
+        #menu {
+            display: none; /* Oculta el menú por defecto */
+            position: absolute;
+            top: 60px; /* Ajusta la posición según tu navbar */
+            right: 20px; /* Ajusta la posición según tu diseño */
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+            padding: 10px;
+        }
+
+        .menu-item {
+            background-color: rgba(140, 108, 247, 0.275);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px;
+            width: 200px;
+            text-align: center;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s;
+        }
+        .menu {
+            display: flex;
+            justify-content: center; /* Centra horizontalmente los elementos internos */
+            flex-wrap: wrap;
+        }
+
+        .menu-item:hover {
+            background-color: rgba(140, 108, 247, 0.5);
+        }
+
+        .menu-item a {
+            text-decoration: none;
+            color: blue;
+            font-size: 18px;
+            display: block;
+        }
+
+        .menu-item a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <img src="logo_ula.png" alt="Logo" onclick="location.href='admin_dashboard.html'">
+        <div class="nav-buttons">
+            <button id="user-name" style="display: none;"></button>
+            <button onclick="location.href='historial_adm.html'" id="reserve-btn" style="display: none;">Reservas</button>
+            <button onclick="location.href='usuarios.html'" id="history-btn" style="display: none;">Usuarios</button>
+            <button onclick="logout()" id="logout-btn" style="display: none;">Cerrar Sesión</button>
+        </div>
+        <div class="menu-icon" onclick="toggleMenu()">☰</div>
+    </div>
+    <div id="menu" class="dropdown-menu">
+        <button onclick="location.href='login.html'" id="login-btn">Historial</button>
+        <button onclick="location.href='registro_ulagos.html'" id="register-btn">Vehiculos</button>
+        <button onclick="location.href='ayuda.html'" id="help-btn">Comentarios</button>
+        <button onclick="location.href='reservar.html'" id="reserve-btn" style="display: none;">Historial</button>
+        <button onclick="location.href='historial.html'" id="history-btn" style="display: none;">Usuarios</button>
+        <button onclick="logout()" id="logout-btn" style="display: none;">Cerrar Sesión</button>
+    </div>
+    <div class="content">
+        <h1>Panel de Administración</h1>
+        <div class="menu">
+            <div class="menu-item">
+                <a href="historial_adm.html">Historial de Reservas</a>
+            </div>
+            <div class="menu-item">
+                <a href="vehiculos.html">Vehículos Registrados</a>
+            </div>
+            <div class="menu-item">
+                <a href="usuarios.html">Usuarios Registrados</a>
+            </div>
+            <div class="menu-item">
+                <a href="comentarios.html">Registro de Comentarios</a>
+            </div>
+        </div>
+    </div>
+    <script src="navbar.js"></script>
+</body>
+</html>

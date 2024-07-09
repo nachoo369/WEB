@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vehículos del Usuario</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .vehiculo {
+            border: 1px solid #ccc;
+            background-color: #f9f9f9;
+            padding: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+        .vehiculo:hover {
+            background-color: #e0e0e0;
+        }
+        .vehiculo-title {
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+        .dialog-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .dialog-box {
+            background-color: white;
+            padding: 20px;
+            max-width: 400px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .dialog-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .form-group {
+            margin-bottom: 10px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .form-group button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin-top: 10px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .form-group button:hover {
+            background-color: #45a049;
+        }
+        .form-group .cancel-btn {
+            background-color: #f44336;
+        }
+        .form-group .cancel-btn:hover {
+            background-color: #db4432;
+        }
+        .dropdown {
+            position: relative;
+            display: inline-block;
+            margin-left: 20px; /* Ajusta según tu diseño */
+            /* Alineación hacia la izquierda */
+            text-align: left;
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(82, 80, 80, 0);
+            z-index: 1;
+            padding: 5px 0;
+            border-radius: 5px;
+            right: 0; /* Ajusta para que el menú aparezca al lado */
+            top: 100%; /* Ajusta la posición vertical según tu diseño */
+        }
+        .dropdown-content a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            cursor: pointer;
+        }
+
+        .dropdown-content a:hover {background-color: #f1f1f1}
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .dropdown:hover .dropbtn {
+            background-color: #ffffff13;
+        }
+        #vehiculos-container {
+            margin-top: 70px; /* Agregar margen superior para evitar que la navbar lo tape */
+        }
+    </style>
+    <!-- Importar Firebase -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
+        import { getFirestore, collection, query, where, getDocs, addDoc, updateDoc, deleteDoc, doc, Timestamp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
+        
+        // Configuración de Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyDPQHtLTQCPoQSAROQHKpFcDN-xuKkYlzg",
+            authDomain: "tallerii-4104d.firebaseapp.com",
+            projectId: "tallerii-4104d",
+            storageBucket: "tallerii-4104d.appspot.com",
+            messagingSenderId: "809208530029",
+            appId: "1:809208530029:web:e823b1a85e167ec9cbab64",
+            measurementId: "G-0E1TRG4GFF"
+        };
+
+        // Inicializar Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        // Función para cargar los vehículos del usuario
+        window.cargarVehiculos = async function() {
+            const userId = auth.currentUser.uid;
+            const vehiculosRef = collection(db, 'vehiculos');
+            const q = query(vehiculosRef, where('userId', '==', userId));
+            const snapshot = await getDocs(q);
+
+            const vehiculosContainer = document.getElementById('vehiculos-container');
+            vehiculosContainer.innerHTML = '';
+
+            snapshot.forEach(doc => {
+                const vehiculo = doc.data();
+                const vehiculoHtml = `
+                    <div class="vehiculo" onclick="abrirEditarVehiculoModal('${doc.id}', '${vehiculo.patente}', '${vehiculo.modelo}', '${vehiculo.color}')">
+                        <div class="vehiculo-title">Patente: ${vehiculo.patente}</div>
+                        <div>Modelo: ${vehiculo.modelo}</div>
+                        <div>Color: ${vehiculo.color}</div>
+                    </div>
+                `;
+                vehiculosContainer.insertAdjacentHTML('beforeend', vehiculoHtml);
+            });
+        }
+
+        // Función para agregar un vehículo
+        window.agregarVehiculo = async function(patente, modelo, color) {
+            const userId = auth.currentUser.uid;
+            await addDoc(collection(db, 'vehiculos'), {
+                userId: userId,
+                patente: patente,
+                modelo: modelo,
+                color: color,
+                createdAt: Timestamp.now()
+            });
+            cargarVehiculos();
+        }
+
+        // Función para editar un vehículo
+        window.editarVehiculo = async function(id, patente, modelo, color) {
+            const vehiculoRef = doc(db, 'vehiculos', id);
+            await updateDoc(vehiculoRef, {
+                patente: patente,
+                modelo: modelo,
+                color: color
+            });
+            cargarVehiculos();
+        }
+
+        // Función para eliminar un vehículo
+        window.eliminarVehiculo = async function(id) {
+            const vehiculoRef = doc(db, 'vehiculos', id);
+            await deleteDoc(vehiculoRef);
+            cargarVehiculos();
+        }
+
+        // Manejo de modales para agregar y editar vehículos
+        window.abrirAgregarVehiculoModal = function() {
+            document.getElementById('edit-patente').value = '';
+            document.getElementById('edit-modelo').value = '';
+            document.getElementById('edit-color').value = '';
+            document.getElementById('edit-dialog-overlay').style.display = 'flex';
+        }
+
+        window.abrirEditarVehiculoModal = function(id, patente, modelo, color) {
+            document.getElementById('edit-patente').value = patente;
+            document.getElementById('edit-modelo').value = modelo;
+            document.getElementById('edit-color').value = color;
+            document.getElementById('edit-dialog-overlay').style.display = 'flex';
+            
+            // Asegúrate de que el botón de guardar tenga el id correcto
+            const guardarEdicionBtn = document.getElementById('guardar-edicion-btn');
+            if (guardarEdicionBtn) {
+                guardarEdicionBtn.onclick = function() {
+                    guardarEdicion(id);
+                };
+            }
+        }
+
+        window.cerrarEditarModal = function() {
+            document.getElementById('edit-dialog-overlay').style.display = 'none';
+        }
+
+        window.guardarEdicion = async function(id) {
+            const patente = document.getElementById('edit-patente').value;
+            const modelo = document.getElementById('edit-modelo').value;
+            const color = document.getElementById('edit-color').value;
+            await editarVehiculo(id, patente, modelo, color);
+            cerrarEditarModal();
+        }
+
+        // Autenticación del usuario
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                document.getElementById('user-name').innerText = user.email;
+                document.getElementById('user-name').style.display = 'block';
+                cargarVehiculos();
+            } else {
+                window.location.href = 'login.html';
+            }
+        });
+        
+        window.logout = function() {
+            auth.signOut().then(() => {
+                window.location.href = 'login.html';
+            });
+        }
+    </script>
+</head>
+<body>
+    <!-- Navbar -->
+    <div class="navbar">
+        <img src="logo_ula.png" alt="Logo" onclick="location.href='index.html'">
+        <div class="nav-buttons">
+            <button id="user-name" style="display: none;"></button>
+            <!-- Menú desplegable para el correo -->
+            <div class="dropdown">
+                <button class="dropbtn" onclick="toggleDropdown('email-options')">☰</button>
+                <div id="email-options" class="dropdown-content">
+                    <a href="historial_reservas.html">Historial de Reservas</a>
+                    <a href="vehiculo.html">Reservar Estacionamiento</a>
+                    <a href="usuario_vehiculos.html">Historial de Vehiculos</a>
+                    <a href="index.html" onclick="logout()">Cerrar Sesión</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contenedor principal -->
+    <div class="container" id="vehiculos-container">
+        <!-- Aquí se añadirán dinámicamente los vehículos -->
+    </div>
+
+    <!-- Botones para agregar y eliminar vehículos -->
+    <div class="container">
+        <button onclick="abrirAgregarVehiculoModal()">Agregar Vehículo</button>
+    </div>
+
+    <!-- Modal para editar vehículo -->
+    <div class="dialog-overlay" id="edit-dialog-overlay">
+        <div class="dialog-box">
+            <div class="dialog-title">Editar Vehículo</div>
+            <div id="edit-form">
+                <div class="form-group">
+                    <label for="edit-patente">Patente:</label>
+                    <input type="text" id="edit-patente" placeholder="Ingrese la patente" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-modelo">Modelo:</label>
+                    <input type="text" id="edit-modelo" placeholder="Ingrese el modelo" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-color">Color:</label>
+                    <input type="text" id="edit-color" placeholder="Ingrese el color" required>
+                </div>
+                <div class="form-group">
+                    <button id="guardar-edicion-btn">Guardar Cambios</button>
+                    <button class="cancel-btn" onclick="cerrarEditarModal()">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

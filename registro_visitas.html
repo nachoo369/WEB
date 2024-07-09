@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Estacionamiento ULagos</title>
     <link rel="stylesheet" href="styles.css">
+    <script type="module" src="firebase-config.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-firestore-compat.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -86,11 +90,11 @@
 
     <div class="container">
         <h1 style="color: blue;">Estacionamiento Visita</h1>
-        <form id="reservaForm" onsubmit="registrar(event)">
-            <label for="correo">Correo Electrónico (solo @ulagos.cl o @alumnos.ulagos.cl):</label>
+        <form id="reservaForm" onsubmit="registrarUsuarioVisita(event)">
+            <label for="correo">Correo Electrónico (example@example.com):</label>
             <input type="email" id="correo" name="correo" required>
 
-            <label for="contrasena">Contraseña (Mayúscula, minúscula, números y signo):</label>
+            <label for="contrasena">Contraseña (Debe contener mayúscula, minúscula, números y signo):</label>
             <input type="password" id="contrasena" name="contrasena" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*\W).{8,}$" required>
 
             <label for="confirmarContrasena">Confirmar Contraseña:</label>
@@ -103,18 +107,6 @@
     </div>
 
     <script>
-        function validarContrasena() {
-            const inputContrasena = document.getElementById('contrasena');
-            const contrasena = inputContrasena.value;
-            const contrasenaPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*\W).{8,}$/;
-
-            if (!contrasenaPattern.test(contrasena)) {
-                inputContrasena.setCustomValidity('La contraseña debe incluir al menos una mayúscula, una minúscula, un número y un carácter especial');
-            } else {
-                inputContrasena.setCustomValidity('');
-            }
-        }
-
         function validarConfirmacionContrasena() {
             const contrasena = document.getElementById('contrasena').value;
             const confirmarContrasena = document.getElementById('confirmarContrasena').value;
@@ -126,13 +118,63 @@
             }
         }
 
-        function validarAntesDeRegistrar() {
-            validarContrasena();
-            validarConfirmacionContrasena();
-            if (document.getElementById('contrasena').checkValidity() && document.getElementById('confirmarContrasena').checkValidity()) {
-                // Ejecutar la función de registrar definida globalmente
-                registrar(event);
+        // Inicialización de Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyDPQHtLTQCPoQSAROQHKpFcDN-xuKkYlzg",
+            authDomain: "tallerii-4104d.firebaseapp.com",
+            projectId: "tallerii-4104d",
+            storageBucket: "tallerii-4104d.appspot.com",
+            messagingSenderId: "809208530029",
+            appId: "1:809208530029:web:e823b1a85e167ec9cbab64",
+            measurementId: "G-0E1TRG4GFF"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        db.enablePersistence()
+            .then(() => {
+                console.log("Firestore habilitado localmente.");
+            })
+            .catch((error) => {
+                console.error("Error al habilitar Firestore localmente:", error);
+            });
+
+        // Función para registrar un usuario de visita
+        function registrarUsuarioVisita(event) {
+            event.preventDefault();
+            
+            const correo = document.getElementById('correo').value;
+            const contrasena = document.getElementById('contrasena').value;
+            const confirmarContrasena = document.getElementById('confirmarContrasena').value;
+
+            if (contrasena !== confirmarContrasena) {
+                document.getElementById('mensajeReserva').textContent = "Las contraseñas no coinciden.";
+                return;
             }
+
+            auth.createUserWithEmailAndPassword(correo, contrasena)
+                .then((userCredential) => {
+                    const user = userCredential.user;
+                    console.log("Usuario registrado:", user.uid);
+
+                    return db.collection('users').doc(user.uid).set({
+                        correo: correo,
+                        nombre: 'visita', // Añadir un campo para distinguir el tipo de usuario
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                })
+                .then(() => {
+                    console.log("Datos adicionales guardados en Firestore.");
+                    document.getElementById("mensajeReserva").textContent = "Usuario registrado con éxito.";
+                    setTimeout(() => {
+                        window.location.href = 'login.html';
+                    }, 3000); // Redirigir después de 3 segundos
+                })
+                .catch((error) => {
+                    console.error("Error al registrar usuario:", error.message);
+                    document.getElementById("mensajeReserva").textContent = `Error: ${error.message}`;
+                });
         }
     </script>
 

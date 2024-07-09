@@ -8,11 +8,15 @@
     <link rel="stylesheet" href="estacionamiento.css">
     <link rel="stylesheet" href="styles.css">
 
-    <script type="module" src="mapa_select.js"></script>
-    <script type="modal" src="firebase-au.js"></script>
+    <!-- Incluir Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-firestore-compat.js"></script>
+    <script defer src="vehiculo.js"></script>
 
-</head>
-<body>
+    <!-- Incluir el archivo JS del vehículo -->
+    <script src="vehiculo.js" defer></script>
+
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -60,48 +64,54 @@
 
         .content {
             text-align: center;
-            padding: 50px;}
-        .leyenda {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 20px;
+            padding: 50px;
         }
-        .leyenda-item {
-            display: flex;
-            align-items: center;
-            margin: 0 10px;
+
+        form {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
         }
-        .cuadro {
-            width: 20px;
-            height: 20px;
-            margin-right: 5px;
+
+        form div {
+            margin-bottom: 10px;
         }
-        .gris {
-            background-color: grey;
+
+        form label {
+            display: inline-block;
+            width: 150px;
+            text-align: right;
+            margin-right: 15px;
+            font-weight: bold;
         }
-        .verde {
-            background-color: green;
+
+        form input[type="text"],
+        form input[type="time"] {
+            width: 300px;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
         }
-        .rojo {
-            background-color: red;
-        }
-        #reservar-btn {
+
+        form button {
             padding: 10px 20px;
             background-color: #4CAF50;
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 4px;
             cursor: pointer;
+            font-size: 16px;
         }
 
-        #reservar-btn:hover {
+        form button:hover {
             background-color: #45a049;
         }
-
-
-
     </style>
-    <script src="firebase-au.js"></script>
 </head>
 <body>
     <div class="navbar">
@@ -112,39 +122,33 @@
             <div class="dropdown">
                 <button class="dropbtn" onclick="toggleDropdown('email-options')">☰</button>
                 <div id="email-options" class="dropdown-content">
-                    <a href="#">Historial de Reservas</a>
+                    <a href="historial_reservas.html">Historial de Reservas</a>
                     <a href="estacionamiento.html">Reservar Estacionamiento</a>
                     <a href="index.html" onclick="logout()">Cerrar Sesión</a>
                 </div>
             </div>
         </div>
     </div>
+
     <main>
-        <h1>Reserva de Estacionamiento</h1>
-        <div class="leyenda">
-            <div class="leyenda-item">
-                <div class="cuadro gris"></div>
-                <span>Disponible</span>
+        <h1>1. Primer paso es agregar un vehículo</h1>
+        <form id="vehiculo-form" onsubmit="submitForm(event)">
+            <div>
+                <label for="color">Color:</label>
+                <input type="text" id="color" name="color" value="Gris" required>
             </div>
-            <div class="leyenda-item">
-                <div class="cuadro verde"></div>
-                <span>Seleccionado</span>
+            <div>
+                <label for="modelo">Modelo:</label>
+                <input type="text" id="modelo" name="modelo" value="Cherry" required>
             </div>
-            <div class="leyenda-item">
-                <div class="cuadro rojo"></div>
-                <span>Ocupado</span>
+            <div>
+                <label for="patente">Patente:</label>
+                <input type="text" id="patente" name="patente" value="JK LZ 45" required>
             </div>
-        </div>
-        <div>
-            <label for="start-time">Hora de inicio:</label>
-            <input type="time" id="start-time">
-        </div>
-        <div>
-            <label for="end-time">Hora de fin:</label>
-            <input type="time" id="end-time">
-        </div>
-        <div id="mapa-lugares-container"></div>
+            <button type="submit">Continuar</button>
+        </form>
     </main>
+
     <div id="dialog-overlay" class="dialog-overlay">
         <div class="dialog">
             <h2 id="dialog-title"></h2>
@@ -152,8 +156,22 @@
             <button id="dialog-close-btn">Cerrar</button>
         </div>
     </div>
-    <button id="reservar-btn">Reservar</button>
-    </div>
+    <script>
 
+        if (!firebase.apps.length) {
+            const firebaseConfig = {
+                apiKey: "AIzaSyDPQHtLTQCPoQSAROQHKpFcDN-xuKkYlzg",
+                authDomain: "tallerii-4104d.firebaseapp.com",
+                projectId: "tallerii-4104d",
+                storageBucket: "tallerii-4104d.appspot.com",
+                messagingSenderId: "809208530029",
+                appId: "1:809208530029:web:e823b1a85e167ec9cbab64",
+                measurementId: "G-0E1TRG4GFF"
+            };
+            firebase.initializeApp(firebaseConfig);
+        }
+
+
+    </script>
 </body>
 </html>

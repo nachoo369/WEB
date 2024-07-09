@@ -3,16 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reserva de Estacionamiento</title>
+    <title>Reserva de Estacionamiento Chuyaca</title>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="estacionamiento.css">
     <link rel="stylesheet" href="styles.css">
 
-    <script type="module" src="mapa_select.js"></script>
+    <script type="module" src="mapa_chuyaca.js"></script>
     <script type="modal" src="firebase-au.js"></script>
 
-</head>
-<body>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -85,6 +83,34 @@
         .rojo {
             background-color: red;
         }
+        .lugar {
+            width: 40px;
+            height: 40px;
+            margin: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid black;
+        }
+
+        .dialog-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .dialog {
+            background: white;
+            padding: 200px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
         #reservar-btn {
             padding: 10px 20px;
             background-color: #4CAF50;
@@ -97,11 +123,17 @@
         #reservar-btn:hover {
             background-color: #45a049;
         }
-
-
-
+        #mapa-lugares-container {
+            display: flex;
+            flex-direction: column;
+            width: 1000px;
+            margin: 0 auto;
+            background-color: #edecf7;
+            padding: 0px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
     </style>
-    <script src="firebase-au.js"></script>
 </head>
 <body>
     <div class="navbar">
@@ -113,14 +145,14 @@
                 <button class="dropbtn" onclick="toggleDropdown('email-options')">☰</button>
                 <div id="email-options" class="dropdown-content">
                     <a href="#">Historial de Reservas</a>
-                    <a href="estacionamiento.html">Reservar Estacionamiento</a>
+                    <a href="estacionamiento_c.html">Reservar Estacionamiento Chuyaca</a>
                     <a href="index.html" onclick="logout()">Cerrar Sesión</a>
                 </div>
             </div>
         </div>
     </div>
     <main>
-        <h1>Reserva de Estacionamiento</h1>
+        <h1>Reserva de Estacionamiento Chuyaca</h1>
         <div class="leyenda">
             <div class="leyenda-item">
                 <div class="cuadro gris"></div>
@@ -143,7 +175,8 @@
             <label for="end-time">Hora de fin:</label>
             <input type="time" id="end-time">
         </div>
-        <div id="mapa-lugares-container"></div>
+        <div id="mapa-lugares-container" class="mapa-lugares">Cargando mapa...
+        </div>
     </main>
     <div id="dialog-overlay" class="dialog-overlay">
         <div class="dialog">
@@ -154,6 +187,5 @@
     </div>
     <button id="reservar-btn">Reservar</button>
     </div>
-
 </body>
 </html>
